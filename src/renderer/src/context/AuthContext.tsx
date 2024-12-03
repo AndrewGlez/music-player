@@ -1,6 +1,10 @@
 import axios from 'axios'
 import React, { createContext, useState, useContext, useEffect } from 'react'
 import jwt from 'jsonwebtoken'
+import PlayerInterface from '@/components/player-interface'
+import { Navigate, useNavigate } from 'react-router-dom'
+import LoginPage from '@/pages/LoginPage'
+import ProtectedRoute from '@/components/ProtectedRoute'
 
 interface AuthContextType {
   isAuthenticated: boolean
@@ -12,13 +16,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check if user is already authenticated
     const token = localStorage.getItem('auth_token')
     if (token) {
       setIsAuthenticated(true)
     }
+    setLoading(false)
   }, [])
 
   const login = async (email: string, password: string) => {
@@ -29,7 +34,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       })
       .then((res) => {
         if (res.status === 200) {
-          console.log('Login successful')
           const webToken = jwt.sign({ email: email }, 'secret', { expiresIn: '1h' })
           localStorage.setItem('auth_token', webToken)
           localStorage.setItem('user_id', res.data.id)
@@ -46,9 +50,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsAuthenticated(false)
   }
 
+  if (loading) {
+    return <div>Loading...</div>
+  }
+
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
       {children}
+      {isAuthenticated ? <PlayerInterface /> : null}
     </AuthContext.Provider>
   )
 }

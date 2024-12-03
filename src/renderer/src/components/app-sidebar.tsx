@@ -37,9 +37,10 @@ import {
 import { Label } from './ui/label'
 import { Textarea } from './ui/textarea'
 import { dialog, ipcRenderer } from 'electron'
+import { useNavigate } from 'react-router-dom'
 
 interface Playlist {
-  name: string
+  title: string
   artist?: string
   cover?: string
   count?: string
@@ -54,7 +55,17 @@ interface User {
   playlists: Playlist[]
 }
 
+interface Song {
+  id: string
+  playlistId: string
+  title: string
+  artist: string
+  url: string
+  thumb: string
+}
+
 export default function MusicPlayerNavbar() {
+  const [songs, setSongs] = useState<Song[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const [playlists, setPlaylists] = useState<Playlist[]>([])
@@ -68,6 +79,7 @@ export default function MusicPlayerNavbar() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { logout } = useAuth()
+  const navigate = useNavigate()
   const playlists1 = [
     { name: 'Liked Songs', count: '2,459 songs', icon: 'heart' },
     {
@@ -104,6 +116,11 @@ export default function MusicPlayerNavbar() {
 
   useEffect(() => {
     const user_id = localStorage.getItem('user_id')
+    // GET Songs
+    axios.get('http://localhost:8080/api/songs').then((res) => {
+      setSongs(res.data)
+    })
+    // GET User data and playlists
     axios.get(`http://localhost:8080/api/users/${user_id}`).then((res) => {
       setUser(res.data)
       setPlaylists(res.data.playlists)
@@ -111,8 +128,16 @@ export default function MusicPlayerNavbar() {
   }, [])
 
   const handleImageUpload = async () => {
-    console.log('asdad')
     const filePath = await ipcRenderer.invoke('dialog:openFile')
+    if (filePath) {
+      const file = await window.electronAPI.readFile(filePath)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string)
+        setImagePath(filePath)
+      }
+      reader.readAsDataURL(new Blob([file]))
+    }
   }
 
   const removeImage = () => {
@@ -122,7 +147,7 @@ export default function MusicPlayerNavbar() {
 
   const filteredPlaylists = playlists.filter(
     (playlist) =>
-      playlist.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      playlist.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       playlist.artist?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
@@ -233,7 +258,10 @@ export default function MusicPlayerNavbar() {
                           Image
                         </Label>
                         <div className="col-span-3">
-                          <div className="flex items-center justify-center w-full">
+                          <div
+                            onClick={handleImageUpload}
+                            className="flex items-center justify-center w-full"
+                          >
                             <label
                               htmlFor="image"
                               className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
@@ -248,7 +276,6 @@ export default function MusicPlayerNavbar() {
                                   SVG, PNG, JPG or GIF (MAX. 800x400px)
                                 </p>
                               </div>
-                              <Button id="image" onClick={handleImageUpload} />
                             </label>
                           </div>
                           {imagePreview && (
@@ -287,7 +314,7 @@ export default function MusicPlayerNavbar() {
               variant="ghost"
               size="icon"
               className="text-white hover:bg-[#232323]"
-              onClick={() => (window.location.href = `/`)}
+              onClick={() => navigate('/', { replace: true })}
             >
               <Home className="h-5 w-5" />
             </Button>
@@ -322,18 +349,27 @@ export default function MusicPlayerNavbar() {
       </div>
       <ScrollArea className="flex-grow">
         <div className="px-2">
+          <div className="flex items-center space-x-3 py-2 px-4 hover:bg-[#232323] rounded-md cursor-pointer">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#65f1da] to-[#ee306f] flex items-center justify-center rounded">
+              <Heart />
+            </div>
+            <div>
+              <div className="font-medium">Liked Songs</div>
+              <div className="text-sm text-[#b3b3b3]">{songs.length} songs</div>
+            </div>
+          </div>
           {filteredPlaylists.map((playlist, index) => (
-            <React.Fragment key={playlist.name}>
+            <React.Fragment key={playlist.title}>
               <div className="flex items-center space-x-3 py-2 px-4 hover:bg-[#232323] rounded-md cursor-pointer">
                 {playlist.icon === 'heart' ? (
                   <div className="w-10 h-10 bg-gradient-to-br from-[#65f1da] to-[#ee306f] flex items-center justify-center rounded">
                     <Heart />
                   </div>
                 ) : (
-                  <img src={playlist.cover} alt={playlist.name} className="w-10 h-10 rounded" />
+                  <img src={playlist.cover} alt={playlist.title} className="w-10 h-10 rounded" />
                 )}
                 <div>
-                  <div className="font-medium">{playlist.name}</div>
+                  <div className="font-medium">{playlist.title}</div>
                   <div className="text-sm text-[#b3b3b3]">{playlist.count || playlist.artist}</div>
                 </div>
               </div>

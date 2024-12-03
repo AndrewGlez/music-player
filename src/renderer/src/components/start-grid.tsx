@@ -5,18 +5,29 @@ import { Button } from '@/components/ui/button'
 import { useNavigate } from 'react-router-dom'
 
 const genres = [
-  { name: 'Pop', icon: Music, gradient: 'from-pink-500 to-rose-500' },
-  { name: 'Rock', icon: Guitar, gradient: 'from-purple-500 to-indigo-500' },
-  { name: 'Hip Hop', icon: Mic2, gradient: 'from-yellow-400 to-orange-500' },
+  { name: 'Pop', icon: Music, gradient: 'from-pink-500 to-rose-500', query: 'pop music' },
+  { name: 'Rock', icon: Guitar, gradient: 'from-purple-500 to-indigo-500', query: 'rock music' },
+  {
+    name: 'Hip Hop',
+    icon: Mic2,
+    gradient: 'from-yellow-400 to-orange-500',
+    query: 'hip hop music'
+  },
   {
     name: 'Electronic',
     icon: Headphones,
-    gradient: 'from-cyan-400 to-blue-500'
+    gradient: 'from-cyan-400 to-blue-500',
+    query: 'electronic music'
   },
-  { name: 'Jazz', icon: Piano, gradient: 'from-amber-400 to-yellow-500' },
-  { name: 'Classical', icon: Radio, gradient: 'from-emerald-400 to-teal-500' },
-  { name: 'R&B', icon: Disc3, gradient: 'from-red-400 to-pink-500' },
-  { name: 'Reggae', icon: Drum, gradient: 'from-lime-400 to-green-500' }
+  { name: 'Jazz', icon: Piano, gradient: 'from-amber-400 to-yellow-500', query: 'jazz music' },
+  {
+    name: 'Classical',
+    icon: Radio,
+    gradient: 'from-emerald-400 to-teal-500',
+    query: 'classical music'
+  },
+  { name: 'R&B', icon: Disc3, gradient: 'from-red-400 to-pink-500', query: 'r&b music' },
+  { name: 'Reggae', icon: Drum, gradient: 'from-lime-400 to-green-500', query: 'reggae music' }
 ]
 
 export default function StartGrid() {
@@ -25,7 +36,7 @@ export default function StartGrid() {
 
   const handleSearch = (e) => {
     e.preventDefault()
-    navigate(`/search?=${searchQuery}`)
+    navigate(`/search?q=${searchQuery}`)
   }
 
   return (
@@ -53,6 +64,10 @@ export default function StartGrid() {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {genres.map((genre) => (
           <div
+            onClick={(e) => {
+              e.preventDefault()
+              navigate(`/search?q=${genre.query}`)
+            }}
             key={genre.name}
             className={`p-6 rounded-lg shadow-lg bg-gradient-to-br ${genre.gradient} transition-transform duration-300 ease-in-out transform hover:scale-105`}
           >

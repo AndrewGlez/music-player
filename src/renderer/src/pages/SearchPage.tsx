@@ -6,14 +6,19 @@ import query from '@/finder'
 import streamAudio from '@/stream.js'
 import audioPlayer from '@/stream.js'
 import { usePlayer } from '@/context/PlayerContext'
+import { Spinner } from '@/components/ui/spinner'
 
 export default function SearchPage() {
   const { setCurrentSong } = usePlayer()
   const [songs, setSongs] = useState([])
+  const [loading, setLoading] = useState(false)
+
   useEffect(() => {
     const search = window.location.href.split('=')[1].replaceAll('%20', ' ')
+    setLoading(true)
     query(search).then((data) => {
       setSongs(data)
+      setLoading(false)
       console.log(data)
     })
   }, [])
@@ -34,35 +39,43 @@ export default function SearchPage() {
   return (
     <div className="min-h-screen w-full bg-black text-white p-4">
       <SearchBar />
-      <div className="max-w-3xl mx-auto space-y-6">
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Songs</h2>
-          <div className="space-y-2">
-            {songs.map((song, index) => (
-              <div
-                key={index}
-                onClick={() => handleSongClick(song)}
-                className="flex items-center gap-4 p-2 rounded-md hover:bg-zinc-800 transition-colors group"
-              >
-                <Play className="opacity-0 group-hover:opacity-100 transition-opacity w-4 h-4 mr-2" />
-                <img
-                  src={song.thumbnail.url}
-                  alt="Song thumbnail"
-                  className="select-none w-10 h-10 rounded object-cover"
-                  width={40}
-                  height={40}
-                />
+      {loading ? (
+        <div className="max-w-3xl mx-auto space-y-6">
+          <div>
+            <h2 className="text-2xl font-semibold mb-4">Songs</h2>
+            <div className="space-y-2">
+              {songs.map((song, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleSongClick(song)}
+                  className="flex items-center gap-4 p-2 rounded-md hover:bg-zinc-800 transition-colors group"
+                >
+                  <Play className="opacity-0 group-hover:opacity-100 transition-opacity w-4 h-4 mr-2" />
+                  <img
+                    src={song.thumbnail.url}
+                    alt="Song thumbnail"
+                    className="select-none w-10 h-10 rounded object-cover"
+                    width={40}
+                    height={40}
+                  />
 
-                <div className="flex-1">
-                  <div className="select-none font-medium group-hover:text-white">{song.title}</div>
-                  <div className="select-none text-sm text-zinc-400">{song.artist}</div>
+                  <div className="flex-1">
+                    <div className="select-none font-medium group-hover:text-white">
+                      {song.title}
+                    </div>
+                    <div className="select-none text-sm text-zinc-400">{song.artist}</div>
+                  </div>
+                  <div className="select-none text-sm text-zinc-400">{song.durationFormatted}</div>
                 </div>
-                <div className="select-none text-sm text-zinc-400">{song.durationFormatted}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="justify-center items-center gap-3">
+          <Spinner className="items-center justify-center" size="large" />
+        </div>
+      )}
     </div>
   )
 }
