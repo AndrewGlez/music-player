@@ -18,7 +18,8 @@ const commonjsPackages = [
   'howler',
   'stream',
   'jsonwebtoken',
-  'crypto'
+  'crypto',
+  'dotenv'
 ] as const
 export default defineConfig({
   main: {

@@ -18,6 +18,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { randomInt } from 'crypto'
+import BACKEND_URL from '@/config'
 
 const countries = [
   { code: 'US', name: 'United States' },
@@ -42,7 +43,7 @@ export default function RegisterPage() {
     e.preventDefault()
     setError(false)
     await axios
-      .post('http://localhost:8080/api/users/create', {
+      .post(`http://${BACKEND_URL}:8080/api/users/create`, {
         id: randomInt(1, 10),
         username: username,
         email: email,

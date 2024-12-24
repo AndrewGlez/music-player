@@ -5,6 +5,7 @@ import PlayerInterface from '@/components/player-interface'
 import { Navigate, useNavigate } from 'react-router-dom'
 import LoginPage from '@/pages/LoginPage'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import BACKEND_URL from '@/config'
 
 interface AuthContextType {
   isAuthenticated: boolean
@@ -28,7 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     await axios
-      .post('http://localhost:8080/api/users/login', {
+      .post(`http://${BACKEND_URL}:8080/api/users/login`, {
         email: email,
         password: password
       })
@@ -47,6 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem('auth_token')
+    localStorage.removeItem('user_id')
     setIsAuthenticated(false)
   }
 

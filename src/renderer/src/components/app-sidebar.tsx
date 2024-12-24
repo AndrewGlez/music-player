@@ -7,8 +7,9 @@ declare global {
   }
 }
 
-import React, { useEffect, useRef, useState } from 'react'
-import { Heart, Library, LogOut, Plus, Search, Settings, Upload, User, X } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { useToast } from '../hooks/use-toast'
+import { Heart, Library, LogOut, Plus, Search, Settings, User } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
@@ -24,7 +25,6 @@ import {
 import { Home } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import axios from 'axios'
-import { toast, useToast } from '@/hooks/use-toast'
 import {
   Dialog,
   DialogContent,
@@ -36,8 +36,8 @@ import {
 } from './ui/dialog'
 import { Label } from './ui/label'
 import { Textarea } from './ui/textarea'
-import { dialog, ipcRenderer } from 'electron'
 import { useNavigate } from 'react-router-dom'
+import BACKEND_URL from '@/config'
 
 interface Playlist {
   title: string
@@ -74,76 +74,21 @@ export default function MusicPlayerNavbar() {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const { toast } = useToast()
-  const [image, setImage] = useState<File | null>(null)
-  const [imagePath, setImagePath] = useState<string | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const { logout } = useAuth()
   const navigate = useNavigate()
-  const playlists1 = [
-    { name: 'Liked Songs', count: '2,459 songs', icon: 'heart' },
-    {
-      name: 'Sonic Frontiers: Cyber Space...',
-      artist: 'Andrew González',
-      cover: '/placeholder.svg?height=40&width=40'
-    },
-    {
-      name: 'rolitas locas 2',
-      artist: 'Andrew González',
-      cover: '/placeholder.svg?height=40&width=40'
-    },
-    {
-      name: 'lofi beats',
-      artist: 'Spotify',
-      cover: '/placeholder.svg?height=40&width=40'
-    },
-    {
-      name: 'stalled',
-      artist: 'Andrew González',
-      cover: '/placeholder.svg?height=40&width=40'
-    },
-    {
-      name: '【Future Funk】',
-      artist: 'Andrew González',
-      cover: '/placeholder.svg?height=40&width=40'
-    },
-    {
-      name: 'This Is Crystal Castles',
-      artist: 'Spotify',
-      cover: '/placeholder.svg?height=40&width=40'
-    }
-  ]
 
   useEffect(() => {
     const user_id = localStorage.getItem('user_id')
     // GET Songs
-    axios.get('http://localhost:8080/api/songs').then((res) => {
+    axios.get(`http://${BACKEND_URL}:8080/api/songs`).then((res) => {
       setSongs(res.data)
     })
     // GET User data and playlists
-    axios.get(`http://localhost:8080/api/users/${user_id}`).then((res) => {
+    axios.get(`http://${BACKEND_URL}:8080/api/users/${user_id}`).then((res) => {
       setUser(res.data)
       setPlaylists(res.data.playlists)
     })
   }, [])
-
-  const handleImageUpload = async () => {
-    const filePath = await ipcRenderer.invoke('dialog:openFile')
-    if (filePath) {
-      const file = await window.electronAPI.readFile(filePath)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string)
-        setImagePath(filePath)
-      }
-      reader.readAsDataURL(new Blob([file]))
-    }
-  }
-
-  const removeImage = () => {
-    setImagePath(null)
-    setImagePreview(null)
-  }
 
   const filteredPlaylists = playlists.filter(
     (playlist) =>
@@ -162,7 +107,12 @@ export default function MusicPlayerNavbar() {
       return
     }
     // Here you would typically send the data to your backend
-    console.log('Creating playlist:', { name, description, imagePath })
+    axios.post(`http://${BACKEND_URL}:8080/api/playlists/create`, {
+      title: name,
+      description: description,
+      userid: localStorage.getItem('user_id')
+    })
+    console.log('Creating playlist:', { name, description })
     toast({
       title: 'Success',
       description: 'Playlist created successfully!'
@@ -170,8 +120,6 @@ export default function MusicPlayerNavbar() {
     setOpen(false)
     setName('')
     setDescription('')
-    setImagePath(null)
-    setImagePreview(null)
   }
 
   return (
@@ -222,7 +170,7 @@ export default function MusicPlayerNavbar() {
                   </Button>
                 </DialogTrigger>
                 <DialogContent className=" sm:max-w-[425px]">
-                  <form onSubmit={handlePlaylistClick}>
+                  <form>
                     <DialogHeader>
                       <DialogTitle>Create New Playlist</DialogTitle>
                       <DialogDescription>
@@ -253,58 +201,11 @@ export default function MusicPlayerNavbar() {
                           className="col-span-3"
                         />
                       </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="image" className="text-right">
-                          Image
-                        </Label>
-                        <div className="col-span-3">
-                          <div
-                            onClick={handleImageUpload}
-                            className="flex items-center justify-center w-full"
-                          >
-                            <label
-                              htmlFor="image"
-                              className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-                            >
-                              <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                <Upload className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" />
-                                <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                                  <span className="font-semibold">Click to upload</span> or drag and
-                                  drop
-                                </p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
-                                  SVG, PNG, JPG or GIF (MAX. 800x400px)
-                                </p>
-                              </div>
-                            </label>
-                          </div>
-                          {imagePreview && (
-                            <div className="mt-4 relative">
-                              <img
-                                src={imagePreview}
-                                alt="Playlist cover"
-                                width={200}
-                                height={200}
-                                style={{ objectFit: 'cover' }}
-                                className="rounded-md"
-                              />
-                              <Button
-                                type="button"
-                                variant="destructive"
-                                size="icon"
-                                className="absolute -top-2 -right-2 rounded-full"
-                                onClick={removeImage}
-                                aria-label="Remove image"
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
                     </div>
                     <DialogFooter>
-                      <Button type="submit">Save Playlist</Button>
+                      <Button onClick={handlePlaylistClick} type="submit">
+                        Save Playlist
+                      </Button>
                     </DialogFooter>
                   </form>
                 </DialogContent>

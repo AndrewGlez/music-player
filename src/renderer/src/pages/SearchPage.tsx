@@ -1,16 +1,27 @@
 'use client'
 import SearchBar from '@/components/search-bar'
 import React, { useEffect, useState } from 'react'
-import { Play } from 'lucide-react'
+import { AlignVerticalSpaceAround, Play } from 'lucide-react'
 import query from '@/finder'
 import streamAudio from '@/stream.js'
 import audioPlayer from '@/stream.js'
 import { usePlayer } from '@/context/PlayerContext'
 import { Spinner } from '@/components/ui/spinner'
+import axios from 'axios'
+import BACKEND_URL from '@/config'
+
+interface Song {
+  title: string
+  thumbnail: {
+    url
+  }
+  artist: string
+  durationFormatted: string
+}
 
 export default function SearchPage() {
   const { setCurrentSong } = usePlayer()
-  const [songs, setSongs] = useState([])
+  const [songs, setSongs] = useState<Song[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -33,6 +44,13 @@ export default function SearchPage() {
         thumbnail: song.thumbnail
       })
       audioPlayer.enqueue(song.url)
+      axios.post(`http://${BACKEND_URL}/songs/add`, {
+        ytId: song.id,
+        title: song.title,
+        artist: song.artist,
+        url: song.url,
+        thumbnailUrl: song.thumbnail.url
+      })
     }
   }
 
@@ -40,6 +58,10 @@ export default function SearchPage() {
     <div className="min-h-screen w-full bg-black text-white p-4">
       <SearchBar />
       {loading ? (
+        <div className="justify-center items-center gap-3">
+          <Spinner className="items-center justify-center" size="large" />
+        </div>
+      ) : (
         <div className="max-w-3xl mx-auto space-y-6">
           <div>
             <h2 className="text-2xl font-semibold mb-4">Songs</h2>
@@ -70,10 +92,6 @@ export default function SearchPage() {
               ))}
             </div>
           </div>
-        </div>
-      ) : (
-        <div className="justify-center items-center gap-3">
-          <Spinner className="items-center justify-center" size="large" />
         </div>
       )}
     </div>

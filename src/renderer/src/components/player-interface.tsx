@@ -13,14 +13,15 @@ import {
 import { useState, useEffect } from 'react'
 import audioPlayer from '../stream.js'
 import { usePlayer } from '@/context/PlayerContext'
-
+import axios from 'axios'
+import BACKEND_URL from '@/config.js'
 export default function PlayerInterface() {
   const { currentSong } = usePlayer()
   const [isPlaying, setIsPlaying] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
-  const [volume, setVolume] = useState(75)
+  const [volume, setVolume] = useState(50)
 
   useEffect(() => {
     // Add listener for audio player state changes
@@ -39,8 +40,16 @@ export default function PlayerInterface() {
       setCurrentTime(timeInfo.current)
       setDuration(timeInfo.total)
     }
+    const interval = setInterval(() => {
+      const timeInfo = audioPlayer.getCurrentTime()
+      if (timeInfo) {
+        setCurrentTime(timeInfo.current)
+        setDuration(timeInfo.total)
+      }
+    }, 1000) // Update every second
 
     return () => {
+      clearInterval(interval)
       unsubscribe()
     }
   }, [])
@@ -50,6 +59,18 @@ export default function PlayerInterface() {
       audioPlayer.pause()
     } else {
       audioPlayer.resume()
+    }
+  }
+  const handleFavorite = () => {
+    setIsFavorite(!isFavorite)
+
+    if (isFavorite) {
+      const userId = localStorage.getItem('user_id')
+      axios.post(`http://${BACKEND_URL}:8080/songs/${userId}/fav/{userId}/add`).then((data) => {
+        if (data.status == 200) {
+          console.log('added to fav')
+        }
+      })
     }
   }
 
@@ -80,7 +101,7 @@ export default function PlayerInterface() {
               <p className="text-xs text-gray-400">{currentSong?.artist || 'Unknown artist'}</p>
             </div>
             <button
-              onClick={() => setIsFavorite(!isFavorite)}
+              onClick={handleFavorite}
               className={`focus:outline-none ${isFavorite ? 'text-green-500' : 'text-gray-400'}`}
             >
               <Heart className="w-5 h-5" />
