@@ -41,7 +41,7 @@ export default function StartGrid() {
 
   return (
     <div className="select-none dark:bg-black container mx-auto px-4 py-8">
-      <h2 className="text-3xl font-bold mb-6 text-center">Music Player</h2>
+      <h2 className="text-3xl font-bold mb-6 text-center text-white">Music Player</h2>
       {/* Search Bar */}
       <form onSubmit={handleSearch} className="text-white mb-8">
         <div className="flex gap-2">
@@ -50,10 +50,10 @@ export default function StartGrid() {
             placeholder="Search for a song..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-grow"
+            className="flex-grow font-semibold "
           />
           <Button type="submit" variant="default" onClick={handleSearch}>
-            <Search className="w-4 h-4 mr-2" />
+            <Search className=" mr-2" />
             Search
           </Button>
         </div>

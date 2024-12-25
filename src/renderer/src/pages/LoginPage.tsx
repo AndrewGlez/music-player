@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, React } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -72,19 +72,9 @@ export default function LoginPage() {
         </form>
         <div className="mt-6">
           <Separator className="my-4" />
-          {/* <div className="flex flex-col space-y-2">
-            <Button variant="outline" className="w-full">
-              <FaGoogle className="mr-2" />
-              Continue with Google
-            </Button>
-            <Button variant="outline" className="w-full">
-              <FaApple className="mr-2" />
-              Continue with Apple
-            </Button>
-          </div> */}
         </div>
         <p className="mt-6 text-center text-sm text-gray-600">
-          Don't have an account?{' '}
+          {` Don't have an account?  `}
           <a href="/register" className="text-purple-600 hover:underline">
             Sign up
           </a>

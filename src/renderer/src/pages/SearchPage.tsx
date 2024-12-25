@@ -1,20 +1,22 @@
 'use client'
 import SearchBar from '@/components/search-bar'
 import React, { useEffect, useState } from 'react'
-import { AlignVerticalSpaceAround, Play } from 'lucide-react'
+import { Play } from 'lucide-react'
 import query from '@/finder'
-import streamAudio from '@/stream.js'
 import audioPlayer from '@/stream.js'
 import { usePlayer } from '@/context/PlayerContext'
 import { Spinner } from '@/components/ui/spinner'
 import axios from 'axios'
 import BACKEND_URL from '@/config'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 interface Song {
   title: string
   thumbnail: {
     url
   }
+  url: string
+  id: string
   artist: string
   durationFormatted: string
 }
@@ -30,7 +32,6 @@ export default function SearchPage() {
     query(search).then((data) => {
       setSongs(data)
       setLoading(false)
-      console.log(data)
     })
   }, [])
 
@@ -41,21 +42,26 @@ export default function SearchPage() {
       setCurrentSong({
         title: song.title,
         artist: song.channel.name,
-        thumbnail: song.thumbnail
+        thumbnail: song.thumbnail,
+        url: song.url,
+        id: song.id,
+        durationFormatted: song.durationFormatted
       })
       audioPlayer.enqueue(song.url)
-      axios.post(`http://${BACKEND_URL}/songs/add`, {
+      axios.post(`http://${BACKEND_URL}:8080/api/songs/add`, {
         ytId: song.id,
         title: song.title,
         artist: song.artist,
         url: song.url,
         thumbnailUrl: song.thumbnail.url
+      }).then((r) => {
+        if (r.status != 200) return
       })
     }
   }
 
   return (
-    <div className="min-h-screen w-full bg-black text-white p-4">
+    <div className=" w-full bg-black text-white p-4">
       <SearchBar />
       {loading ? (
         <div className="justify-center items-center gap-3">
@@ -65,7 +71,7 @@ export default function SearchPage() {
         <div className="max-w-3xl mx-auto space-y-6">
           <div>
             <h2 className="text-2xl font-semibold mb-4">Songs</h2>
-            <div className="space-y-2">
+            <ScrollArea className="space-y-2">
               {songs.map((song, index) => (
                 <div
                   key={index}
@@ -90,7 +96,7 @@ export default function SearchPage() {
                   <div className="select-none text-sm text-zinc-400">{song.durationFormatted}</div>
                 </div>
               ))}
-            </div>
+            </ScrollArea>
           </div>
         </div>
       )}

@@ -1,5 +1,5 @@
-import { Input } from "@/components/ui/input";
-import { Search, X } from "lucide-react";
+import * as React from "react";
+import { Search } from "lucide-react";
 import { useState } from "react";
 
 export default function SearchBar() {
@@ -8,7 +8,6 @@ export default function SearchBar() {
     const handleSubmit = (e) => {
         if (query === "") return;
         e.preventDefault();
-        console.log(query);
         window.location.href = `/search?q=${query}`;
     };
 

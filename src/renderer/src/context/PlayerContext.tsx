@@ -3,6 +3,8 @@ import React, { createContext, useState, useContext } from 'react'
 interface SongInfo {
   title: string
   artist: string
+  url: string
+  id: string
   thumbnail: {
     url: string
   }

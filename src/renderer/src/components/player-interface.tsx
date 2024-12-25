@@ -8,8 +8,10 @@ import {
   Pause,
   Mic2,
   Laptop2,
-  Volume2
+  Volume2,
+  Music
 } from 'lucide-react'
+import * as React from 'react'
 import { useState, useEffect } from 'react'
 import audioPlayer from '../stream.js'
 import { usePlayer } from '@/context/PlayerContext'
@@ -61,18 +63,7 @@ export default function PlayerInterface() {
       audioPlayer.resume()
     }
   }
-  const handleFavorite = () => {
-    setIsFavorite(!isFavorite)
 
-    if (isFavorite) {
-      const userId = localStorage.getItem('user_id')
-      axios.post(`http://${BACKEND_URL}:8080/songs/${userId}/fav/{userId}/add`).then((data) => {
-        if (data.status == 200) {
-          console.log('added to fav')
-        }
-      })
-    }
-  }
 
   const handleVolumeChange = (e) => {
     const newVolume = parseInt(e.target.value)
@@ -87,33 +78,32 @@ export default function PlayerInterface() {
   }
 
   return (
-    <div className="bg-black text-white w-full fixed bottom-0 left-0 right-0">
+    <div className="bg-fixed bg-[url('https://w.wallhaven.cc/full/n6/wallhaven-n625q4.jpg')] text-white w-full fixed bottom-0 left-0 right-0">
       <div className="max-w-[1200px] mx-auto py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4 w-1/4">
-            <img
-              src={currentSong?.thumbnail.url || '/placeholder.svg?height=56&width=56'}
-              alt="Album cover"
-              className="w-14 h-14 object-cover"
-            />
-            <div>
+          <div className="flex items-center space-x-4 w-1/4 ">
+            {currentSong?.thumbnail.url ? (
+              <img
+                src={currentSong.thumbnail.url}
+                alt="Album cover"
+                className="w-14 h-14 object-cover"
+              />
+            ) : (
+              <Music className="w-10 h-10" />
+            )}
+            <div >
               <h2 className="text-sm font-semibold">{currentSong?.title || 'No track playing'}</h2>
-              <p className="text-xs text-gray-400">{currentSong?.artist || 'Unknown artist'}</p>
+              <p className="text-xs text-gray-300">{currentSong?.artist || 'Unknown artist'}</p>
             </div>
-            <button
-              onClick={handleFavorite}
-              className={`focus:outline-none ${isFavorite ? 'text-green-500' : 'text-gray-400'}`}
-            >
-              <Heart className="w-5 h-5" />
-            </button>
+
           </div>
 
-          <div className="flex flex-col items-center w-1/2">
-            <div className="flex items-center space-x-6 mb-2">
-              <button className="focus:outline-none text-gray-400">
+          <div className="flex flex-col items-center w-1/2 mx-10">
+            <div className="flex py-1 items-center space-x-6 mb-2">
+              <button className="focus:outline-none text-gray-300">
                 <Shuffle className="w-5 h-5" />
               </button>
-              <button className="focus:outline-none text-gray-400">
+              <button className="focus:outline-none text-gray-300">
                 <SkipBack className="w-5 h-5" />
               </button>
               <button
@@ -122,10 +112,10 @@ export default function PlayerInterface() {
               >
                 {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
               </button>
-              <button className="focus:outline-none text-gray-400">
+              <button className="focus:outline-none text-gray-300">
                 <SkipForward className="w-5 h-5" />
               </button>
-              <button className="focus:outline-none text-gray-400">
+              <button className="focus:outline-none text-gray-300">
                 <Repeat className="w-5 h-5" />
               </button>
             </div>
@@ -146,14 +136,14 @@ export default function PlayerInterface() {
           </div>
 
           <div className="flex items-center space-x-4 w-1/4 justify-end">
-            <button className="focus:outline-none text-gray-400">
+            <button className="focus:outline-none text-gray-300">
               <Mic2 className="w-5 h-5" />
             </button>
-            <button className="focus:outline-none text-gray-400">
+            <button className="focus:outline-none text-gray-300">
               <Laptop2 className="w-5 h-5" />
             </button>
             <div className="flex items-center space-x-2">
-              <Volume2 className="w-5 h-5 text-gray-400" />
+              <Volume2 className="w-5 h-5 text-gray-300" />
               <input
                 type="range"
                 min="0"

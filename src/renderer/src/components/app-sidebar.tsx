@@ -9,7 +9,7 @@ declare global {
 
 import React, { useEffect, useState } from 'react'
 import { useToast } from '../hooks/use-toast'
-import { Heart, Library, LogOut, Plus, Search, Settings, User } from 'lucide-react'
+import { History, Library, LogOut, Plus, Search, Settings, Trash2Icon, User } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
@@ -38,6 +38,7 @@ import { Label } from './ui/label'
 import { Textarea } from './ui/textarea'
 import { useNavigate } from 'react-router-dom'
 import BACKEND_URL from '@/config'
+import PlaylistIcon from './PlaylistIcon' // Import the new SVG component
 
 interface Playlist {
   title: string
@@ -66,7 +67,7 @@ interface Song {
 
 export default function MusicPlayerNavbar() {
   const [songs, setSongs] = useState<Song[]>([])
-  const [isSearching, setIsSearching] = useState(false)
+  const [isSearching, setIsSearching] = useState(true)
   const [user, setUser] = useState<User | null>(null)
   const [playlists, setPlaylists] = useState<Playlist[]>([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -98,7 +99,7 @@ export default function MusicPlayerNavbar() {
 
   const handlePlaylistClick = (e: React.FormEvent) => {
     e.preventDefault()
-    if (name.trim() === '') {
+    if (name.trim() === '' || description.trim() === '') {
       toast({
         title: 'Error',
         description: 'Playlist name is required',
@@ -157,64 +158,58 @@ export default function MusicPlayerNavbar() {
             <span className="font-semibold">Your Library</span>
           </div>
           <div className="flex items-center space-x-2">
-            <Button
-              onClick={handlePlaylistClick}
-              variant="ghost"
-              size="icon"
-              className="text-white hover:bg-[#232323]"
-            >
-              <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-white hover:bg-[#232323]">
-                    <Plus className="h-5 w-5" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className=" sm:max-w-[425px]">
-                  <form>
-                    <DialogHeader>
-                      <DialogTitle>Create New Playlist</DialogTitle>
-                      <DialogDescription>
-                        Enter the details for your new playlist here. Click save when you're done.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="name" className="text-right">
-                          Name
-                        </Label>
-                        <Input
-                          id="name"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          className="col-span-3"
-                          required
-                        />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="description" className="text-right">
-                          Description
-                        </Label>
-                        <Textarea
-                          id="description"
-                          value={description}
-                          onChange={(e) => setDescription(e.target.value)}
-                          className="col-span-3"
-                        />
-                      </div>
+
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-white hover:bg-primary hover:text-white">
+                  <Plus className="h-5 w-5" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className=" sm:max-w-[425px]">
+                <form>
+                  <DialogHeader>
+                    <DialogTitle>Create New Playlist</DialogTitle>
+                    <DialogDescription>
+                      {` Enter the details for your new playlist here. Click save when you're done. `}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="name" className="text-right">
+                        Name
+                      </Label>
+                      <Input
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="col-span-3"
+                        required
+                      />
                     </div>
-                    <DialogFooter>
-                      <Button onClick={handlePlaylistClick} type="submit">
-                        Save Playlist
-                      </Button>
-                    </DialogFooter>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            </Button>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="description" className="text-right">
+                        Description
+                      </Label>
+                      <Textarea
+                        id="description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        className="col-span-3"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button onClick={handlePlaylistClick} type="submit">
+                      Save Playlist
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
             <Button
               variant="ghost"
               size="icon"
-              className="text-white hover:bg-[#232323]"
+              className="text-white hover:text-white hover:bg-primary"
               onClick={() => navigate('/', { replace: true })}
             >
               <Home className="h-5 w-5" />
@@ -236,48 +231,44 @@ export default function MusicPlayerNavbar() {
               variant="ghost"
               size="icon"
               onClick={() => setIsSearching(true)}
-              className="text-[#b3b3b3] hover:text-white"
+              className="text-[#b3b3b3] hover:text-white hover:bg-primary"
             >
               <Search className="h-5 w-5" />
             </Button>
           )}
-          {!isSearching && (
-            <Button variant="ghost" className="text-sm text-[#b3b3b3] hover:text-white">
-              Recents
-            </Button>
-          )}
+
         </div>
       </div>
       <ScrollArea className="flex-grow">
         <div className="px-2">
           <div className="flex items-center space-x-3 py-2 px-4 hover:bg-[#232323] rounded-md cursor-pointer">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#65f1da] to-[#ee306f] flex items-center justify-center rounded">
-              <Heart />
+            <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-purple-700 flex items-center justify-center rounded">
+              <History />
             </div>
             <div>
-              <div className="font-medium">Liked Songs</div>
+              <div className="font-medium">History</div>
               <div className="text-sm text-[#b3b3b3]">{songs.length} songs</div>
             </div>
           </div>
+          <Separator className='bg-zinc-800 my-5' />
+
           {filteredPlaylists.map((playlist, index) => (
             <React.Fragment key={playlist.title}>
-              <div className="flex items-center space-x-3 py-2 px-4 hover:bg-[#232323] rounded-md cursor-pointer">
-                {playlist.icon === 'heart' ? (
-                  <div className="w-10 h-10 bg-gradient-to-br from-[#65f1da] to-[#ee306f] flex items-center justify-center rounded">
-                    <Heart />
-                  </div>
-                ) : (
-                  <img src={playlist.cover} alt={playlist.title} className="w-10 h-10 rounded" />
-                )}
+              <div className="flex items-center py-2 px-4 hover:bg-[#232323] rounded-md cursor-pointer">
+                <PlaylistIcon />
                 <div>
-                  <div className="font-medium">{playlist.title}</div>
+                  <div className="ml-3 font-medium">{playlist.title}</div>
                   <div className="text-sm text-[#b3b3b3]">{playlist.count || playlist.artist}</div>
                 </div>
+                <Trash2Icon className="h-4 w-4 ml-auto hover:text-red-600" />
+
               </div>
+
               {index < filteredPlaylists.length - 1 && <Separator className="my-2 bg-[#282828]" />}
             </React.Fragment>
           ))}
         </div>
+
       </ScrollArea>
     </div>
   )
