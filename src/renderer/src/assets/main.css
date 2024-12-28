@@ -2,13 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --foreground: #ededed;
-  }
-}
-
 @layer base {
+  @font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    src: url('../../../../resources/Ubuntu-Regular.ttf');
+  }
+  @font-face {
+    font-family: 'BebasNeue';
+    font-style: serif;
+    src: url('../../../../resources/BebasNeue-Regular.ttf');
+  }
+  @font-face {
+    font-family: 'LexendPeta';
+    font-style: serif;
+    src: url('../../../../resources/LexendPeta-VariableFont_wght.ttf');
+  }
   :root {
     --background: 0 0% 100%;
     --foreground: 224 71.4% 4.1%;
@@ -69,6 +78,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }

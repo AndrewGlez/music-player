@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
 import RegisterPage from './pages/RegisterPage'
 import { Route, Routes } from 'react-router-dom'
+import PlaylistInfoPage from './pages/PlaylistInfoPage'
 
 function App(): JSX.Element {
   return (
@@ -48,6 +49,14 @@ function AppContent(): JSX.Element {
                 </ProtectedRoute>
               }
             />
+            <Route path="/playlist" element={
+              <ProtectedRoute>
+                <>
+                  <MusicPlayerNavbar />
+                  <PlaylistInfoPage />
+                </>
+              </ProtectedRoute>} />
+
           </Routes>
         </div>
       </div>

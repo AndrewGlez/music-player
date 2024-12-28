@@ -8,6 +8,7 @@ interface SongInfo {
   thumbnail: {
     url: string
   }
+  durationFormatted: string
 }
 
 interface PlayerContextType {

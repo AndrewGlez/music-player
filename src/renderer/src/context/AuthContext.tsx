@@ -2,10 +2,9 @@ import axios from 'axios'
 import React, { createContext, useState, useContext, useEffect } from 'react'
 import jwt from 'jsonwebtoken'
 import PlayerInterface from '@/components/player-interface'
-import { Navigate, useNavigate } from 'react-router-dom'
-import LoginPage from '@/pages/LoginPage'
-import ProtectedRoute from '@/components/ProtectedRoute'
 import BACKEND_URL from '@/config'
+
+import { Spinner } from '@/components/ui/spinner'
 
 interface AuthContextType {
   isAuthenticated: boolean
@@ -24,7 +23,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (token) {
       setIsAuthenticated(true)
     }
-    setLoading(false)
+    axios.get(`http://${BACKEND_URL}:8080/actuator/health`).then((res) => {
+      if (res.data.status == "UP") {
+        setLoading(false)
+      }
+    })
   }, [])
 
   const login = async (email: string, password: string) => {
@@ -53,7 +56,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   if (loading) {
-    return <div>Loading...</div>
+    return <div className='flex w-screen h-screen bg-black text-purple-700 text-center justify-center items-center p-4'>
+      <Spinner size={'large'} />
+    </div>
   }
 
   return (

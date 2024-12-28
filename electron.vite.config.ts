@@ -19,7 +19,8 @@ const commonjsPackages = [
   'stream',
   'jsonwebtoken',
   'crypto',
-  'dotenv'
+  'dotenv',
+  'node:fs'
 ] as const
 export default defineConfig({
   main: {

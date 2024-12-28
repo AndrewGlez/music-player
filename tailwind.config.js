@@ -7,6 +7,9 @@ module.exports = {
     './src/renderer/src/app/**/*.{js,ts,jsx,tsx,mdx}'
   ],
   theme: {
+    fontFamily: {
+      sans: ['Ubuntu', 'sans-serif']
+    },
     extend: {
       colors: {
         background: 'hsl(var(--background))',

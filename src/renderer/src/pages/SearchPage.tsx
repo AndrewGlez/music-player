@@ -53,7 +53,8 @@ export default function SearchPage() {
         title: song.title,
         artist: song.artist,
         url: song.url,
-        thumbnailUrl: song.thumbnail.url
+        thumbnailUrl: song.thumbnail.url,
+        duration: song.durationFormatted
       }).then((r) => {
         if (r.status != 200) return
       })

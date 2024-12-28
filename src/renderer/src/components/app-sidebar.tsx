@@ -1,12 +1,3 @@
-declare global {
-  interface Window {
-    electronAPI: {
-      openFile: () => Promise<string | undefined>
-      readFile: (filePath: string) => Promise<string>
-    }
-  }
-}
-
 import React, { useEffect, useState } from 'react'
 import { useToast } from '../hooks/use-toast'
 import { History, Library, LogOut, Plus, Search, Settings, Trash2Icon, User } from 'lucide-react'
@@ -14,7 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,6 +32,7 @@ import BACKEND_URL from '@/config'
 import PlaylistIcon from './PlaylistIcon' // Import the new SVG component
 
 interface Playlist {
+  id: number
   title: string
   artist?: string
   cover?: string
@@ -129,14 +121,13 @@ export default function MusicPlayerNavbar() {
         <div className="flex items-center justify-between mb-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="p-0 h-auto hover:bg-transparent">
-                <Avatar className="w-8 h-8 mr-2">
-                  <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
+              <Button variant="ghost" className="justify-start p-0 w-24 h-10 hover:bg-primary hover:text-white">
+                <Avatar className="text-black w-8 h-8 mr-2">
                   <AvatarFallback>
                     <User className="h-4 w-4" />
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-sm font-medium">{user?.username}</span>
+                <span className="font-['BebasNeue'] mt-1 text-xl hover:text-primary">{user?.username.toLocaleUpperCase()}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 bg-[#282828] text-white border-[#3e3e3e]">
@@ -254,7 +245,7 @@ export default function MusicPlayerNavbar() {
 
           {filteredPlaylists.map((playlist, index) => (
             <React.Fragment key={playlist.title}>
-              <div className="flex items-center py-2 px-4 hover:bg-[#232323] rounded-md cursor-pointer">
+              <a href={`/playlist?p=${playlist.id}`} className="flex items-center py-2 px-4 hover:bg-[#232323] rounded-md cursor-pointer">
                 <PlaylistIcon />
                 <div>
                   <div className="ml-3 font-medium">{playlist.title}</div>
@@ -262,7 +253,7 @@ export default function MusicPlayerNavbar() {
                 </div>
                 <Trash2Icon className="h-4 w-4 ml-auto hover:text-red-600" />
 
-              </div>
+              </a>
 
               {index < filteredPlaylists.length - 1 && <Separator className="my-2 bg-[#282828]" />}
             </React.Fragment>

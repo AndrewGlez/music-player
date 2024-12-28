@@ -1,9 +1,10 @@
 import { Howl } from 'howler'
-import { exec } from 'child_process'
+import { exec, spawn, spawnSync } from 'child_process'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { promisify } from 'util'
 import { v4 as uuidv4 } from 'uuid'
+import { stat, statSync } from 'node:fs'
 
 const execAsync = promisify(exec)
 
@@ -12,7 +13,7 @@ class AudioPlayer {
     this.sound = null
     this.queue = []
     this.isPlaying = false
-    this.volume = 0.5
+    this.volume = 0.02
     this.tempFiles = new Set()
     this.listeners = new Set()
   }
@@ -23,20 +24,31 @@ class AudioPlayer {
   }
 
   updateListeners() {
-    this.listeners.forEach(callback => callback({
-      isPlaying: this.isPlaying,
-      currentTime: this.getCurrentTime()
-    }))
+    this.listeners.forEach((callback) =>
+      callback({
+        isPlaying: this.isPlaying,
+        currentTime: this.getCurrentTime()
+      })
+    )
   }
 
   async downloadAudio(url) {
-    const tempPath = join(tmpdir(), `${uuidv4()}.mp3`)
+    const idResult = spawnSync('yt-dlp', ['--print', 'filename', '-o', '%(id)s.mp3', url])
+    const idTempPath = join(tmpdir(), idResult.stdout.toString().trim())
+    console.log(idTempPath)
+    const tempPath = join(tmpdir(), `%(id)s.mp3`)
     const command = `yt-dlp -x --audio-format mp3 -o "${tempPath}" ${url}`
 
     try {
-      await execAsync(command)
-      this.tempFiles.add(tempPath)
-      return tempPath
+      const existingFile = await statSync(idTempPath)
+      if (existingFile) {
+        this.tempFiles.add(idTempPath)
+        return idTempPath
+      } else {
+        await execAsync(command)
+        this.tempFiles.add(tempPath)
+        return tempPath
+      }
     } catch (error) {
       console.error('Error downloading audio:', error)
       throw error
@@ -65,7 +77,7 @@ class AudioPlayer {
         },
         onloaderror: (id, error) => {
           console.error('Error loading audio:', error)
-          this.cleanupTempFile(localPath)
+          //this.cleanupTempFile(localPath)
           this.playNext()
         }
       })
