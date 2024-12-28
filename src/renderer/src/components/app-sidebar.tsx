@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useToast } from '../hooks/use-toast'
 import { History, Library, LogOut, Plus, Search, Settings, Trash2Icon, User } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
@@ -25,6 +24,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from './ui/dialog'
+import { ToastContainer, toast } from 'react-toastify';
 import { Label } from './ui/label'
 import { Textarea } from './ui/textarea'
 import { useNavigate } from 'react-router-dom'
@@ -66,21 +66,25 @@ export default function MusicPlayerNavbar() {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
-  const { toast } = useToast()
   const { logout } = useAuth()
   const navigate = useNavigate()
 
-  useEffect(() => {
+  const getPlaylists = async () => {
     const user_id = localStorage.getItem('user_id')
+
+    axios.get(`http://${BACKEND_URL}:8080/api/users/${user_id}`).then((res) => {
+      setUser(res.data)
+      setPlaylists(res.data.playlists)
+    })
+  }
+
+  useEffect(() => {
     // GET Songs
     axios.get(`http://${BACKEND_URL}:8080/api/songs`).then((res) => {
       setSongs(res.data)
     })
     // GET User data and playlists
-    axios.get(`http://${BACKEND_URL}:8080/api/users/${user_id}`).then((res) => {
-      setUser(res.data)
-      setPlaylists(res.data.playlists)
-    })
+    getPlaylists()
   }, [])
 
   const filteredPlaylists = playlists.filter(
@@ -89,14 +93,21 @@ export default function MusicPlayerNavbar() {
       playlist.artist?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const handlePlaylistClick = (e: React.FormEvent) => {
+  const handleDelete = (e: React.FormEvent, id: number) => {
+    e.preventDefault();
+    axios.delete(`http://${BACKEND_URL}:8080/api/playlists/${id}`).then((res) => {
+      setPlaylists(prevPlaylists => prevPlaylists.filter(playlist => playlist.id !== id))
+      console.log('Playlist deleted:', res.data)
+      toast('Success')
+    })
+  }
+
+  const handlePlaylistClick = async (e: React.FormEvent) => {
     e.preventDefault()
     if (name.trim() === '' || description.trim() === '') {
-      toast({
-        title: 'Error',
-        description: 'Playlist name is required',
-        variant: 'destructive'
-      })
+      toast(
+        'Playlist name is required'
+      )
       return
     }
     // Here you would typically send the data to your backend
@@ -104,12 +115,14 @@ export default function MusicPlayerNavbar() {
       title: name,
       description: description,
       userid: localStorage.getItem('user_id')
+    }).then(async () => {
+      await getPlaylists()
     })
+
     console.log('Creating playlist:', { name, description })
-    toast({
-      title: 'Success',
-      description: 'Playlist created successfully!'
-    })
+    toast(
+      " Playlist created successfully!"
+    )
     setOpen(false)
     setName('')
     setDescription('')
@@ -251,14 +264,15 @@ export default function MusicPlayerNavbar() {
                   <div className="ml-3 font-medium">{playlist.title}</div>
                   <div className="text-sm text-[#b3b3b3]">{playlist.count || playlist.artist}</div>
                 </div>
-                <Trash2Icon className="h-4 w-4 ml-auto hover:text-red-600" />
-
+                <Trash2Icon onClick={(e) => handleDelete(e, playlist.id)} className="h-4 w-4 ml-auto hover:text-red-600" />
               </a>
 
               {index < filteredPlaylists.length - 1 && <Separator className="my-2 bg-[#282828]" />}
             </React.Fragment>
           ))}
         </div>
+        <ToastContainer />
+
 
       </ScrollArea>
     </div>

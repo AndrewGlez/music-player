@@ -56,7 +56,6 @@ const PlaylistInfoPage: React.FC = () => {
     }, []);
 
     const handleSongClick = (song) => {
-        console.log(song)
         if (audioPlayer.isPlaying) {
             audioPlayer.stop()
         } else {

@@ -35,20 +35,23 @@ class AudioPlayer {
   async downloadAudio(url) {
     const idResult = spawnSync('yt-dlp', ['--print', 'filename', '-o', '%(id)s.mp3', url])
     const idTempPath = join(tmpdir(), idResult.stdout.toString().trim())
-    console.log(idTempPath)
     const tempPath = join(tmpdir(), `%(id)s.mp3`)
     const command = `yt-dlp -x --audio-format mp3 -o "${tempPath}" ${url}`
 
     try {
-      const existingFile = await statSync(idTempPath)
-      if (existingFile) {
-        this.tempFiles.add(idTempPath)
-        return idTempPath
-      } else {
-        await execAsync(command)
-        this.tempFiles.add(tempPath)
-        return tempPath
+      try {
+        const existingFile = await statSync(idTempPath)
+        if (existingFile) {
+          this.tempFiles.add(idTempPath)
+          return idTempPath
+        }
+      } catch (error) {
+        console.log('Error checking for existing file')
       }
+
+      await execAsync(command)
+      this.tempFiles.add(tempPath)
+      return idTempPath
     } catch (error) {
       console.error('Error downloading audio:', error)
       throw error
