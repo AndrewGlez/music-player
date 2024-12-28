@@ -2,7 +2,6 @@ package com.zel.musicplayer.controller;
 
 import com.zel.musicplayer.entity.Playlist;
 import com.zel.musicplayer.entity.Song;
-import com.zel.musicplayer.entity.User;
 import com.zel.musicplayer.repo.PlaylistRepository;
 import com.zel.musicplayer.repo.SongRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,13 +51,17 @@ public class PlaylistController {
         playlistRepository.deleteById(id);
     }
 
-    @PostMapping("/playlists/{playlistId}/addSong/{songId}")
-    public ResponseEntity<String> addSongToPlaylist( @PathVariable Integer playlistId, @PathVariable Integer songId) {
-        songRepository.findById(songId)
-                .orElseThrow(() -> new IllegalArgumentException("Song with id " + songId + " not found"))
-                .setPlaylistId(playlistId);
-        return ResponseEntity.ok("Added song " +
-                songRepository.findById(songId).get().getTitle()
-                + " to playlist " + playlistRepository.findById(playlistId).get().getTitle());
+    @PostMapping("/playlists/{id}/addSong/{songId}")
+    public ResponseEntity<Object> addSongToPlaylist(@PathVariable Integer id, @PathVariable Integer songId) {
+        Playlist playlist = playlistRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Playlist with id " + id + " not found"));
+        Song song = songRepository.findById(songId).orElseThrow(() -> new IllegalArgumentException("Song with id " + songId + " not found"));
+
+        playlist.getTracks().add(song);
+        playlistRepository.save(playlist);
+
+        return ResponseEntity.ok().body("Added song to playlist");
+
     }
+
+
 }

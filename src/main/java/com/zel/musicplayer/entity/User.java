@@ -1,38 +1,44 @@
 package com.zel.musicplayer.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
-@Entity
-@Table(name = "musicUser")
-@NoArgsConstructor
 @Getter
 @Setter
+@Entity
+@Table(name = "musicuser")
 public class User implements Serializable {
+
     @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
+    @Column(name = "id")
     private Integer id;
-    @Column(nullable = false)
+
+    @NotNull
+    @Column(name = "username", nullable = false, length = Integer.MAX_VALUE)
     private String username;
-    @Column(nullable = false)
+
+    @NotNull
+    @Column(name = "password", nullable = false, length = Integer.MAX_VALUE)
     private String password;
-    @Column(nullable = false)
+
+    @NotNull
+    @Column(name = "email", nullable = false, length = Integer.MAX_VALUE)
     private String email;
-    @Column(nullable = false)
+
+    @NotNull
+    @Column(name = "country", nullable = false, length = Integer.MAX_VALUE)
     private String country;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userid", cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
-    private List<Playlist> playlists;
-
-
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "userid")
+    private Set<Playlist> playlists;
 
 }

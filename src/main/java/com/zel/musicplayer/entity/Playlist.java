@@ -3,34 +3,38 @@ package com.zel.musicplayer.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
-@Entity
-@Table(name = "playlist")
-@NoArgsConstructor
 @Getter
 @Setter
-public class Playlist implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+@Entity
+@Table(name = "playlist")
+public class Playlist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
 
     @NotNull
+    @Column(name = "userid", nullable = false)
     private Integer userid;
 
+    @NotNull
+    @Column(name = "title", nullable = false, length = Integer.MAX_VALUE)
     private String title;
 
+    @NotNull
+    @Column(name = "description", nullable = false, length = Integer.MAX_VALUE)
     private String description;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "playlistId", cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
-    private List<Song> tracks;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinTable(
+            name = "playlist-songs", joinColumns = @JoinColumn(name = "playlist_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id")
+    )
+    private Set<Song> tracks;
+
+
 }
