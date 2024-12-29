@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import BACKEND_URL from '@/config';
-import { Separator } from '@/components/ui/separator'
-import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Search, Shuffle, User } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Trash2Icon, User } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { AiOutlineSpotify } from "react-icons/ai";
 import { usePlayer } from '@/context/PlayerContext';
 import audioPlayer from '@/stream';
+import {
+    ContextMenu,
+    ContextMenuContent,
+    ContextMenuItem,
+    ContextMenuTrigger,
+} from "@/components/ui/context-menu"
+
+
 
 
 interface Song {
@@ -18,7 +24,7 @@ interface Song {
     url: string
     id: string
     artist: string
-    durationFormatted: string
+    duration: string
 }
 
 
@@ -31,27 +37,25 @@ interface Playlist {
 
 const PlaylistInfoPage: React.FC = () => {
     const { setCurrentSong } = usePlayer()
-    const [songs, setSongs] = useState<Song[]>([])
 
     const [playlist, setPlaylist] = useState<Playlist>();
     const [username, setUsername] = useState<string>();
-    useEffect(() => {
+
+    const fetchSongs = async () => {
         const playlistId = window.location.href.split('=')[1]
 
-        const fetchSongs = async () => {
-            try {
-                const response = await axios.get(`http://${BACKEND_URL}:8080/api/playlists/${playlistId}`)
-                    .then((res) => { setPlaylist(res.data) });
-                axios.get(`http://${BACKEND_URL}:8080/api/users/${localStorage.getItem('user_id')}`).then((res) => {
-                    setUsername(res.data.username)
-                })
+        try {
+            await axios.get(`http://${BACKEND_URL}:8080/api/playlists/${playlistId}`)
+                .then((res) => { setPlaylist(res.data) });
+            axios.get(`http://${BACKEND_URL}:8080/api/users/${localStorage.getItem('user_id')}`).then((res) => {
+                setUsername(res.data.username)
+            })
 
-            } catch (e) {
-                console.log(e)
-            }
-        };
-
-
+        } catch (e) {
+            console.log(e)
+        }
+    };
+    useEffect(() => {
         fetchSongs();
     }, []);
 
@@ -71,13 +75,21 @@ const PlaylistInfoPage: React.FC = () => {
 
         }
     }
+    const handleDeleteSong = (playlistId: number, songId: string) => {
+        axios.delete(`http://${BACKEND_URL}:8080/api/playlists/${playlistId}/deleteSong/${songId}`).then(async (res) => {
+            console.log(res.data)
+            await fetchSongs()
+        })
+    }
 
     return (
         <div className="w-full min-h-screen bg-gradient-to-b from-primary to-neutral-950">
             <div className="px-6 py-14">
                 <div className="space-y-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-white md:text-5xl">{playlist?.title}</h1>
+                        <h1 className="text-3xl font-bold font-[LexendPeta] text-white md:text-5xl">{playlist?.title}</h1>
+                        <span className="text-sm font-thin text-zinc-400">{playlist?.description}</span>
+
                         <div className="mt-2 flex items-center gap-2">
                             <Avatar className="h-6 w-6">
                                 <AvatarFallback><User className='p-1'></User></AvatarFallback>
@@ -89,9 +101,9 @@ const PlaylistInfoPage: React.FC = () => {
 
 
                     <div className="relative py-10">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="border-b border-zinc-700/50 text-left text-sm text-zinc-400">
+                        <table className="w-full select-none">
+                            <thead >
+                                <tr className="border-b border-white/15 text-left text-sm text-zinc-400">
                                     <th className="pb-3 pl-4">#</th>
                                     <th className="pb-3 pl-4">Title</th>
                                     <th className="pb-3 pl-4">Artist</th>
@@ -102,23 +114,40 @@ const PlaylistInfoPage: React.FC = () => {
                                 {playlist?.tracks.map((track, i) => (
                                     <tr
                                         key={i}
-                                        className="group hover:bg-white/10 select-none"
-                                        onClick={() => handleSongClick(track)}
+                                        className="group hover:bg-white/10 select-none rounded"
+
                                     >
                                         <td className="px-4 py-2 text-zinc-400">{i + 1}</td>
-                                        <td className="px-4 py-2">
-                                            <div className="flex items-center gap-3">
-                                                <AiOutlineSpotify className='text-white text-xl ' />
 
-                                                <div>
-                                                    <div className="text-white">{track.title}</div>
-                                                    <div className="text-sm text-zinc-400">{track.artist}</div>
-                                                </div>
-                                            </div>
-                                        </td>
+                                        <ContextMenu>
+                                            <ContextMenuTrigger>
+                                                <td className="px-4 py-2">
+                                                    <div className="flex text-neutral-400 hover:text-white items-center gap-3">
+                                                        <AiOutlineSpotify className=' text-xl ' />
+
+                                                        <div>
+                                                            <div onClick={() => handleSongClick(track)}
+                                                            >{track.title}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                            </ContextMenuTrigger>
+                                            <ContextMenuContent>
+                                                <ContextMenuItem onClick={() => handleDeleteSong(playlist.id, track.id)} className='flex gap-3'>
+                                                    <Trash2Icon className='w-4 h-4 text-red-500' />
+
+                                                    Remove
+
+                                                </ContextMenuItem>
+
+                                            </ContextMenuContent>
+                                        </ContextMenu>
                                         <td className="px-4 py-2 text-zinc-400">{track.artist ?? "Unknown artist"}</td>
                                         <td className="px-4 py-2 text-right text-zinc-400">{track.duration ?? "Unknown duration"}</td>
+
                                     </tr>
+
                                 ))}
                             </tbody>
                         </table>

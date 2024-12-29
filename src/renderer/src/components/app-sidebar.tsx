@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { History, Library, LogOut, Plus, Search, Settings, Trash2Icon, User } from 'lucide-react'
+import { History, Library, LogOut, Plus, Search, Settings, Trash2Icon, User, UserRoundSearchIcon } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
@@ -247,11 +247,11 @@ export default function MusicPlayerNavbar() {
         <div className="px-2">
           <div className="flex items-center space-x-3 py-2 px-4 hover:bg-[#232323] rounded-md cursor-pointer">
             <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-purple-700 flex items-center justify-center rounded">
-              <History />
+              <UserRoundSearchIcon />
             </div>
             <div>
-              <div className="font-medium">History</div>
-              <div className="text-sm text-[#b3b3b3]">{songs.length} songs</div>
+              <div className="font-medium">Find online users</div>
+              {/* <div className="text-sm text-[#b3b3b3]">{songs.length} songs</div> */}
             </div>
           </div>
           <Separator className='bg-zinc-800 my-5' />

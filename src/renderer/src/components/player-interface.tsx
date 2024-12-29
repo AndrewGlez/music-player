@@ -100,22 +100,22 @@ export default function PlayerInterface() {
 
           <div className="flex flex-col items-center w-1/2 mx-10">
             <div className="flex py-1 items-center space-x-6 mb-2">
-              <button className="focus:outline-none text-gray-300">
+              <button className="focus:outline-none hover:text-primary text-gray-300">
                 <Shuffle className="w-5 h-5" />
               </button>
-              <button className="focus:outline-none text-gray-300">
+              <button className="focus:outline-none hover:text-primary text-gray-300">
                 <SkipBack className="w-5 h-5" />
               </button>
               <button
                 onClick={handlePlayPause}
-                className="focus:outline-none bg-white text-black rounded-full p-2"
+                className="focus:outline-none hover:text-primary bg-white text-black rounded-full p-2"
               >
                 {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
               </button>
-              <button className="focus:outline-none text-gray-300">
+              <button className="focus:outline-none hover:text-primary text-gray-300">
                 <SkipForward className="w-5 h-5" />
               </button>
-              <button className="focus:outline-none text-gray-300">
+              <button className="focus:outline-none hover:text-primary text-gray-300">
                 <Repeat className="w-5 h-5" />
               </button>
             </div>

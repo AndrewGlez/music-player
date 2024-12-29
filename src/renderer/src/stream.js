@@ -1,10 +1,9 @@
 import { Howl } from 'howler'
-import { exec, spawn, spawnSync } from 'child_process'
+import { exec, spawnSync } from 'child_process'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { promisify } from 'util'
-import { v4 as uuidv4 } from 'uuid'
-import { stat, statSync } from 'node:fs'
+import { statSync } from 'node:fs'
 
 const execAsync = promisify(exec)
 
@@ -23,15 +22,6 @@ class AudioPlayer {
     return () => this.listeners.delete(callback)
   }
 
-  updateListeners() {
-    this.listeners.forEach((callback) =>
-      callback({
-        isPlaying: this.isPlaying,
-        currentTime: this.getCurrentTime()
-      })
-    )
-  }
-
   async downloadAudio(url) {
     const idResult = spawnSync('yt-dlp', ['--print', 'filename', '-o', '%(id)s.mp3', url])
     const idTempPath = join(tmpdir(), idResult.stdout.toString().trim())
@@ -40,7 +30,7 @@ class AudioPlayer {
 
     try {
       try {
-        const existingFile = await statSync(idTempPath)
+        const existingFile = statSync(idTempPath)
         if (existingFile) {
           this.tempFiles.add(idTempPath)
           return idTempPath
@@ -60,10 +50,7 @@ class AudioPlayer {
 
   async play(url) {
     try {
-      // Cleanup previous sound
-      if (this.sound) {
-        this.sound.unload()
-      }
+      console.log('is playing: ', this.isPlaying)
 
       const localPath = await this.downloadAudio(url)
 
@@ -80,7 +67,6 @@ class AudioPlayer {
         },
         onloaderror: (id, error) => {
           console.error('Error loading audio:', error)
-          //this.cleanupTempFile(localPath)
           this.playNext()
         }
       })
@@ -99,7 +85,6 @@ class AudioPlayer {
       if (this.sound) {
         this.sound.volume(value)
       }
-      this.updateListeners()
     }
   }
 
@@ -107,7 +92,6 @@ class AudioPlayer {
     if (this.sound) {
       this.sound.pause()
       this.isPlaying = false
-      this.updateListeners()
     }
   }
 
@@ -115,12 +99,14 @@ class AudioPlayer {
     if (this.sound) {
       this.sound.play()
       this.isPlaying = true
-      this.updateListeners()
     }
   }
 
   stop() {
-    this.sound = null
+    if (this.sound) {
+      this.sound.stop()
+      this.sound = null
+    }
     this.isPlaying = false
     this.queue = []
   }
@@ -154,7 +140,6 @@ class AudioPlayer {
   }
 
   formatTime(seconds) {
-    // Round seconds to nearest integer
     seconds = Math.floor(seconds)
 
     const hours = Math.floor(seconds / 3600)
@@ -168,6 +153,5 @@ class AudioPlayer {
   }
 }
 
-// Export a singleton instance
 const audioPlayer = new AudioPlayer()
 export default audioPlayer

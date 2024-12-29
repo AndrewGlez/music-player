@@ -1,7 +1,7 @@
 'use client'
 import SearchBar from '@/components/search-bar'
-import React, { useEffect, useState } from 'react'
-import { Play } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Play, PlusCircle } from 'lucide-react'
 import query from '@/finder'
 import audioPlayer from '@/stream.js'
 import { usePlayer } from '@/context/PlayerContext'
@@ -9,6 +9,25 @@ import { Spinner } from '@/components/ui/spinner'
 import axios from 'axios'
 import BACKEND_URL from '@/config'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Button } from '@/components/ui/button'
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { toast } from 'react-toastify'
 
 interface Song {
   title: string
@@ -21,16 +40,59 @@ interface Song {
   durationFormatted: string
 }
 
+
+interface Song {
+  title: string
+  thumbnail: {
+    url
+  }
+  url: string
+  id: string
+  channel: {
+    name
+  }
+  durationFormatted: string
+}
+
+interface SavedSong {
+  title: string
+  thumbnail: {
+    url
+  }
+  url: string
+  ytId: string
+  id: string
+  artist: string
+  durationFormatted: string
+}
+interface Playlist {
+  id: string;
+  title: string;
+  description: string;
+  tracks: Song[];
+}
+
 export default function SearchPage() {
   const { setCurrentSong } = usePlayer()
   const [songs, setSongs] = useState<Song[]>([])
   const [loading, setLoading] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [playlists, setPlaylists] = useState<Playlist[]>()
+  const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist>()
+  const [savedSong, setSavedSong] = useState<SavedSong | null>(null)
 
+  const getPlaylists = async () => {
+    const user_id = localStorage.getItem('user_id')
+
+    axios.get(`http://${BACKEND_URL}:8080/api/users/${user_id}`).then((res) => {
+      setPlaylists(res.data.playlists)
+    })
+  }
   useEffect(() => {
     const search = window.location.href.split('=')[1].replaceAll('%20', ' ')
     setLoading(true)
     query(search).then((data) => {
-      setSongs(data)
+      setSongs(data as any)
       setLoading(false)
     })
   }, [])
@@ -51,7 +113,7 @@ export default function SearchPage() {
       axios.post(`http://${BACKEND_URL}:8080/api/songs/add`, {
         ytId: song.id,
         title: song.title,
-        artist: song.artist,
+        artist: song.channel.name,
         url: song.url,
         thumbnailUrl: song.thumbnail.url,
         duration: song.durationFormatted
@@ -60,6 +122,46 @@ export default function SearchPage() {
       })
     }
   }
+
+  const handlePlaylistDialog = async (song: Song) => {
+    console.log(song)
+    axios.post(`http://${BACKEND_URL}:8080/api/songs/add`, {
+      ytId: song.id,
+      title: song.title,
+      artist: song.channel.name,
+      url: song.url,
+      thumbnailUrl: song.thumbnail.url,
+      duration: song.durationFormatted
+    }).then((r) => {
+
+      setSavedSong({
+        id: r.data.id,
+        ytId: r.data.ytId,
+        title: r.data.title,
+        artist: r.data.artist,
+        url: r.data.url,
+        thumbnail: r.data.thumbnail,
+        durationFormatted: r.data.durationFormatted
+      })
+      console.log("Saved song: ", r.data)
+      return
+
+    })
+
+    setIsDialogOpen(true)
+    await getPlaylists()
+  }
+
+  const handleAddSong = async (playlistId: string) => {
+    console.log(savedSong)
+    axios.post(`http://${BACKEND_URL}:8080/api/playlists/${playlistId}/addSong/${savedSong?.id}`)
+      .then((r) => {
+        if (r.status == 200) {
+          toast.success("Song saved successfully")
+        } else toast.error("An error occurred saving song")
+      })
+  }
+
 
   return (
     <div className=" w-full bg-black text-white p-4">
@@ -76,7 +178,6 @@ export default function SearchPage() {
               {songs.map((song, index) => (
                 <div
                   key={index}
-                  onClick={() => handleSongClick(song)}
                   className="flex items-center gap-4 p-2 rounded-md hover:bg-zinc-800 transition-colors group"
                 >
                   <Play className="opacity-0 group-hover:opacity-100 transition-opacity w-4 h-4 mr-2" />
@@ -89,9 +190,56 @@ export default function SearchPage() {
                   />
 
                   <div className="flex-1">
-                    <div className="select-none font-medium group-hover:text-white">
-                      {song.title}
-                    </div>
+                    <ContextMenu>
+                      <ContextMenuTrigger>
+                        <div onClick={() => handleSongClick(song)}
+                          className="select-none font-medium group-hover:text-primary">
+                          {song.title}
+                        </div>
+                      </ContextMenuTrigger>
+                      <ContextMenuContent>
+                        <ContextMenuItem onClick={() => handlePlaylistDialog(song)}>
+                          <PlusCircle className="text-blue-600 font-bold w-4 h-4 mr-2" />
+                          Add to playlist
+                        </ContextMenuItem>
+
+
+
+                      </ContextMenuContent>
+                    </ContextMenu>
+                    <Dialog open={isDialogOpen} onOpenChange={() => {
+                      setIsDialogOpen(!isDialogOpen); setTimeout(() => {
+                        window.location.reload()
+                      }, 5000);
+                    }}>
+                      <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Select a playlist</DialogTitle>
+                          <DialogDescription>
+                            Select a playlist to add the song.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <Select onValueChange={(value) => setSelectedPlaylist(playlists?.find(playlist => playlist.id === value))} value={selectedPlaylist?.id}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Choose a playlist" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {playlists?.map((playlist) => (
+                              <SelectItem key={playlist.id} value={playlist.id}>
+                                {playlist.title}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <DialogFooter className="sm:justify-start">
+                          <DialogClose asChild>
+                            <Button onClick={() => selectedPlaylist?.id && handleAddSong(selectedPlaylist.id)} type="button" variant="default">
+                              OK
+                            </Button>
+                          </DialogClose>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
                     <div className="select-none text-sm text-zinc-400">{song.artist}</div>
                   </div>
                   <div className="select-none text-sm text-zinc-400">{song.durationFormatted}</div>
