@@ -23,7 +23,7 @@ class AudioPlayer {
     return () => this.listeners.delete(callback)
   }
 
-  async downloadAudio(url) {
+  downloadAudio(url) {
     let ytDlpPath = 'yt-dlp'
     switch (process.platform) {
       case 'win32':
@@ -39,8 +39,9 @@ class AudioPlayer {
           console.log('yt-dlp not found in PATH')
           console.log('downloading yt-dlp...')
           toast.warning('Yt-dlp not found in PATH, Downloading yt-dlp...')
-          execSync(
-            'curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_x86.exe -o ./yt-dlp.exe'
+          spawnSync(
+            'curl',
+            ['-L', 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_x86.exe', '-o', './yt-dlp.exe']
           )
           ytDlpPath = './yt-dlp.exe'
         }
@@ -58,8 +59,15 @@ class AudioPlayer {
           console.log('yt-dlp not found in PATH')
           console.log('downloading yt-dlp...')
           toast.warning('Yt-dlp not found in PATH, Downloading yt-dlp...')
-          execSync(
-            'curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o /usr/bin/yt-dlp && chmod a+rx /usr/bin/yt-dlp'
+          spawn(
+            'curl',
+            ['-L', 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux', '-o', '/usr/bin/yt-dlp'],
+            { detached: true }
+          )
+          spawn(
+            'chmod',
+            ['a+rx', '/usr/bin/yt-dlp'],
+            { detached: true }
           )
           ytDlpPath = './yt-dlp'
         }
@@ -75,7 +83,7 @@ class AudioPlayer {
         throw new Error(`Unsupported platform: ${process.platform}`)
     }
 
-    const idResult = await spawn(ytDlpPath, ['--print', 'filename', '-o', '%(id)s.mp3', url])
+    const idResult = spawnSync(ytDlpPath, ['--print', 'filename', '-o', '%(id)s.mp3', url])
     const idTempPath = join(tmpdir(), idResult.stdout.toString().trim())
     const tempPath = join(tmpdir(), `%(id)s.mp3`)
     const command = `yt-dlp -x --audio-format mp3 -o "${tempPath}" ${url}`
