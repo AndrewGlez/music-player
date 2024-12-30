@@ -58,8 +58,8 @@ class AudioPlayer {
           console.log('yt-dlp not found in PATH')
           console.log('downloading yt-dlp...')
           toast.warning('Yt-dlp not found in PATH, Downloading yt-dlp...')
-          await exec(
-            'curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o ./yt-dlp && chmod a+rx ./yt-dlp'
+          execSync(
+            'curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o /usr/bin/yt-dlp && chmod a+rx /usr/bin/yt-dlp'
           )
           ytDlpPath = './yt-dlp'
         }
