@@ -69,15 +69,20 @@ class AudioPlayer extends EventEmitter {
   async play(url) {
     try {
       console.log('is playing: ', this.isPlaying)
+      let socket = '/tmp/mpvsocket'
 
-      const command = `mpv --no-video --input-ipc-server=\\\\.\\pipe\\mpv-pipe "${url}"`
+      if (process.platform === 'win32') {
+        socket = '\\\\.\\pipe\\mpv-pipe'
+      }
+
+      const command = `mpv --no-video --input-ipc-server=${socket} "${url}"`
 
       await execAsync(command)
 
       this.sound = new mpv({
         audio_only: true,
         debug: false,
-        socket: '\\\\.\\pipe\\mpv-pipe', // Windows
+        socket: socket, // Windows
         time_update: 1,
         verbose: false
       })

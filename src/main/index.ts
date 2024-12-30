@@ -3,7 +3,6 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import * as fs from 'fs/promises'
-import audioPlayer from '../renderer/src/stream.js'
 import { spawn } from 'child_process'
 
 function createWindow(): void {
