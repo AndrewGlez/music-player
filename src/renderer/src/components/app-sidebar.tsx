@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { History, Library, LogOut, Plus, Search, Settings, Trash2Icon, User, UserRoundSearchIcon } from 'lucide-react'
+import { ChevronRightCircleIcon, History, Library, LogOut, Plus, Search, Settings, Trash2Icon, User, UserRoundSearchIcon } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
@@ -245,12 +245,15 @@ export default function MusicPlayerNavbar() {
       </div>
       <ScrollArea className="flex-grow">
         <div className="px-2">
-          <div className="flex items-center space-x-3 py-2 px-4 hover:bg-[#232323] rounded-md cursor-pointer">
+          <div className="flex items-center space-x-3 py-2 px-4 hover:bg-[#232323]  rounded-md cursor-pointer">
             <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-purple-700 flex items-center justify-center rounded">
               <UserRoundSearchIcon />
             </div>
             <div>
-              <div className="font-medium">Find online users</div>
+              <div onClick={() => navigate("/online-users")} className="flex items-center justify-start font-medium">
+                Find online users
+                <ChevronRightCircleIcon className='w-5/12 h-5/w-5/12 ml-5 justify-end hover:text-white text-green-400' />
+              </div>
               {/* <div className="text-sm text-[#b3b3b3]">{songs.length} songs</div> */}
             </div>
           </div>
@@ -264,7 +267,7 @@ export default function MusicPlayerNavbar() {
                   <div className="ml-3 font-medium">{playlist.title}</div>
                   <div className="text-sm text-[#b3b3b3]">{playlist.count || playlist.artist}</div>
                 </div>
-                <Trash2Icon onClick={(e) => handleDelete(e, playlist.id)} className="h-4 w-4 ml-auto hover:text-red-600" />
+                <Trash2Icon onClick={(e) => handleDelete(e, playlist.id)} className="h-5 w-5 ml-auto hover:text-red-600" />
               </a>
 
               {index < filteredPlaylists.length - 1 && <Separator className="my-2 bg-[#282828]" />}

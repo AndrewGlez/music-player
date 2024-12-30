@@ -40,7 +40,7 @@ export default function StartGrid() {
   }
 
   return (
-    <div className="select-none dark:bg-black container mx-auto px-4 py-8">
+    <div className="select-none dark:bg-black container mx-auto p-24">
       <h2 className="text-3xl font-bold mb-6 text-center text-white">Music Player</h2>
       {/* Search Bar */}
       <form onSubmit={handleSearch} className="text-white mb-8">

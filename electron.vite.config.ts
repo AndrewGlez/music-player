@@ -20,7 +20,8 @@ const commonjsPackages = [
   'jsonwebtoken',
   'crypto',
   'dotenv',
-  'node:fs'
+  'node:fs',
+  'stompjs'
 ] as const
 export default defineConfig({
   main: {

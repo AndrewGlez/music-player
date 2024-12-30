@@ -164,7 +164,7 @@ export default function SearchPage() {
 
 
   return (
-    <div className=" w-full bg-black text-white p-4">
+    <ScrollArea className=" w-full overflow-auto bg-black text-white p-4">
       <SearchBar />
       {loading ? (
         <div className="justify-center items-center gap-3">
@@ -174,7 +174,7 @@ export default function SearchPage() {
         <div className="max-w-3xl mx-auto space-y-6">
           <div>
             <h2 className="text-2xl font-semibold mb-4">Songs</h2>
-            <ScrollArea className="space-y-2">
+            <div className="h-[1080px] space-y-2">
               {songs.map((song, index) => (
                 <div
                   key={index}
@@ -245,10 +245,10 @@ export default function SearchPage() {
                   <div className="select-none text-sm text-zinc-400">{song.durationFormatted}</div>
                 </div>
               ))}
-            </ScrollArea>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </ScrollArea>
   )
 }

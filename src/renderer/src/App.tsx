@@ -8,6 +8,7 @@ import { AuthProvider } from './context/AuthContext'
 import RegisterPage from './pages/RegisterPage'
 import { Route, Routes } from 'react-router-dom'
 import PlaylistInfoPage from './pages/PlaylistInfoPage'
+import FindUsersOnline from './pages/OnlinePage'
 
 function App(): JSX.Element {
   return (
@@ -54,6 +55,14 @@ function AppContent(): JSX.Element {
                 <>
                   <MusicPlayerNavbar />
                   <PlaylistInfoPage />
+                </>
+              </ProtectedRoute>} />
+
+            <Route path="/online-users" element={
+              <ProtectedRoute>
+                <>
+                  <MusicPlayerNavbar />
+                  <FindUsersOnline />
                 </>
               </ProtectedRoute>} />
 
