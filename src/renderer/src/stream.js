@@ -25,66 +25,6 @@ class AudioPlayer {
 
   async downloadAudio(url) {
     let ytDlpPath = 'yt-dlp'
-    switch (process.platform) {
-      case 'win32':
-        ytDlpPath = process.env.PATH.split(';').find((path) => {
-          try {
-            const stat = statSync(join(path, 'yt-dlp.exe'))
-            return stat.isFile()
-          } catch {
-            return false
-          }
-        })
-        if (typeof ytDlpPath === 'undefined') {
-          console.log('yt-dlp not found in PATH')
-          console.log('downloading yt-dlp...')
-          toast.warning('Yt-dlp not found in PATH, Downloading yt-dlp...')
-          spawnSync('curl', [
-            '-L',
-            'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_x86.exe',
-            '-o',
-            './yt-dlp.exe'
-          ])
-          ytDlpPath = './yt-dlp.exe'
-        }
-        break
-      case 'linux':
-        ytDlpPath = process.env.PATH.split(':').find((path) => {
-          try {
-            const stat = statSync(join(path, 'yt-dlp'))
-            return stat.isFile()
-          } catch {
-            return false
-          }
-        })
-        if (typeof ytDlpPath === 'undefined') {
-          console.log('yt-dlp not found in PATH')
-          console.log('downloading yt-dlp...')
-          toast.warning('Yt-dlp not found in PATH, Downloading yt-dlp...')
-          spawn(
-            'curl',
-            [
-              '-L',
-              'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux',
-              '-o',
-              '/usr/bin/yt-dlp'
-            ],
-            { detached: true }
-          )
-          spawn('chmod', ['a+rx', './yt-dlp'], { detached: true })
-          ytDlpPath = './yt-dlp'
-        }
-        break
-      case 'darwin':
-        ytDlpPath = '/usr/local/bin/yt-dlp'
-        if (!statSync(ytDlpPath).isFile()) {
-          console.error('yt-dlp not found in PATH')
-          throw new Error('yt-dlp not found in PATH')
-        }
-        break
-      default:
-        throw new Error(`Unsupported platform: ${process.platform}`)
-    }
 
     const idResult = spawnSync(ytDlpPath, ['--print', 'filename', '-o', '%(id)s.mp3', url])
     const idTempPath = join(tmpdir(), idResult.stdout.toString().trim())
