@@ -24,7 +24,7 @@ class AudioPlayer {
   }
 
   async downloadAudio(url) {
-    let ytDlpPath
+    let ytDlpPath = 'yt-dlp'
     switch (process.platform) {
       case 'win32':
         ytDlpPath = process.env.PATH.split(';').find((path) => {
@@ -36,10 +36,14 @@ class AudioPlayer {
           }
         })
         if (typeof ytDlpPath === 'undefined') {
-          console.error('yt-dlp.exe not found in PATH')
-          throw new Error('yt-dlp.exe not found in PATH')
+          console.log('yt-dlp not found in PATH')
+          console.log('downloading yt-dlp...')
+          toast.warning('Yt-dlp not found in PATH, Downloading yt-dlp...')
+          execSync(
+            'curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_x86.exe -o ./yt-dlp.exe'
+          )
+          ytDlpPath = './yt-dlp.exe'
         }
-        ytDlpPath = join(ytDlpPath, 'yt-dlp.exe')
         break
       case 'linux':
         ytDlpPath = process.env.PATH.split(':').find((path) => {
@@ -55,10 +59,10 @@ class AudioPlayer {
           console.log('downloading yt-dlp...')
           toast.warning('Yt-dlp not found in PATH, Downloading yt-dlp...')
           execSync(
-            'curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o /usr/bin/yt-dlp && chmod a+rx /usr/bin/yt-dlp'
+            'curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o ./yt-dlp && chmod a+rx ./yt-dlp'
           )
+          ytDlpPath = './yt-dlp'
         }
-        ytDlpPath = join(ytDlpPath, 'yt-dlp')
         break
       case 'darwin':
         ytDlpPath = '/usr/local/bin/yt-dlp'
@@ -71,7 +75,7 @@ class AudioPlayer {
         throw new Error(`Unsupported platform: ${process.platform}`)
     }
 
-    const idResult = spawnSync('yt-dlp', ['--print', 'filename', '-o', '%(id)s.mp3', url])
+    const idResult = await spawn(ytDlpPath, ['--print', 'filename', '-o', '%(id)s.mp3', url])
     const idTempPath = join(tmpdir(), idResult.stdout.toString().trim())
     const tempPath = join(tmpdir(), `%(id)s.mp3`)
     const command = `yt-dlp -x --audio-format mp3 -o "${tempPath}" ${url}`
