@@ -5,6 +5,7 @@ import { join } from 'path'
 import { promisify } from 'util'
 import { statSync } from 'node:fs'
 import { toast } from 'react-toastify'
+import { execSync } from 'node:child_process'
 
 const execAsync = promisify(exec)
 
