@@ -44,6 +44,14 @@ class AudioPlayer {
           )
           ytDlpPath = './yt-dlp.exe'
         }
+          console.log('yt-dlp not found in PATH')
+          console.log('downloading yt-dlp...')
+          toast.warning('Yt-dlp not found in PATH, Downloading yt-dlp...')
+          execSync(
+            'curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_x86.exe -o ./yt-dlp.exe'
+          )
+          ytDlpPath = './yt-dlp.exe'
+        }
         break
       case 'linux':
         ytDlpPath = process.env.PATH.split(':').find((path) => {
@@ -62,6 +70,7 @@ class AudioPlayer {
             'curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o ./yt-dlp && chmod a+rx ./yt-dlp'
           )
           ytDlpPath = './yt-dlp'
+          ytDlpPath = './yt-dlp'
         }
         break
       case 'darwin':
@@ -75,6 +84,7 @@ class AudioPlayer {
         throw new Error(`Unsupported platform: ${process.platform}`)
     }
 
+    const idResult = await spawn(ytDlpPath, ['--print', 'filename', '-o', '%(id)s.mp3', url])
     const idResult = await spawn(ytDlpPath, ['--print', 'filename', '-o', '%(id)s.mp3', url])
     const idTempPath = join(tmpdir(), idResult.stdout.toString().trim())
     const tempPath = join(tmpdir(), `%(id)s.mp3`)
