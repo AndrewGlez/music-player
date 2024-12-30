@@ -1,5 +1,5 @@
 import { Howl } from 'howler'
-import { exec, spawnSync } from 'child_process'
+import { exec, spawnSync, execSync } from 'child_process'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { promisify } from 'util'
