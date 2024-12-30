@@ -23,7 +23,7 @@ class AudioPlayer {
     return () => this.listeners.delete(callback)
   }
 
-  downloadAudio(url) {
+  async downloadAudio(url) {
     let ytDlpPath = 'yt-dlp'
     switch (process.platform) {
       case 'win32':
@@ -39,10 +39,12 @@ class AudioPlayer {
           console.log('yt-dlp not found in PATH')
           console.log('downloading yt-dlp...')
           toast.warning('Yt-dlp not found in PATH, Downloading yt-dlp...')
-          spawnSync(
-            'curl',
-            ['-L', 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_x86.exe', '-o', './yt-dlp.exe']
-          )
+          spawnSync('curl', [
+            '-L',
+            'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_x86.exe',
+            '-o',
+            './yt-dlp.exe'
+          ])
           ytDlpPath = './yt-dlp.exe'
         }
         break
@@ -61,14 +63,15 @@ class AudioPlayer {
           toast.warning('Yt-dlp not found in PATH, Downloading yt-dlp...')
           spawn(
             'curl',
-            ['-L', 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux', '-o', '/usr/bin/yt-dlp'],
+            [
+              '-L',
+              'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux',
+              '-o',
+              '/usr/bin/yt-dlp'
+            ],
             { detached: true }
           )
-          spawn(
-            'chmod',
-            ['a+rx', '/usr/bin/yt-dlp'],
-            { detached: true }
-          )
+          spawn('chmod', ['a+rx', './yt-dlp'], { detached: true })
           ytDlpPath = './yt-dlp'
         }
         break
