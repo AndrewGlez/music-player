@@ -12,6 +12,7 @@ import {
     ContextMenuItem,
     ContextMenuTrigger,
 } from "@/components/ui/context-menu"
+import { ToastContainer } from 'react-toastify';
 
 
 
@@ -83,7 +84,10 @@ const PlaylistInfoPage: React.FC = () => {
     }
 
     return (
+
         <div className="w-full min-h-screen bg-gradient-to-b from-primary to-neutral-950">
+            <ToastContainer />
+
             <div className="px-6 py-14">
                 <div className="space-y-4">
                     <div>
