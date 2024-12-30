@@ -58,7 +58,6 @@ interface Song {
 }
 
 export default function MusicPlayerNavbar() {
-  const [songs, setSongs] = useState<Song[]>([])
   const [isSearching, setIsSearching] = useState(true)
   const [user, setUser] = useState<User | null>(null)
   const [playlists, setPlaylists] = useState<Playlist[]>([])
@@ -79,10 +78,7 @@ export default function MusicPlayerNavbar() {
   }
 
   useEffect(() => {
-    // GET Songs
-    axios.get(`http://${BACKEND_URL}:8080/api/songs`).then((res) => {
-      setSongs(res.data)
-    })
+
     // GET User data and playlists
     getPlaylists()
   }, [])
