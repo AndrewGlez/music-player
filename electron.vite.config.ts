@@ -21,7 +21,8 @@ const commonjsPackages = [
   'crypto',
   'dotenv',
   'node:fs',
-  'stompjs'
+  'stompjs',
+  'node:events'
 ] as const
 export default defineConfig({
   main: {

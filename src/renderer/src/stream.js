@@ -5,17 +5,27 @@ import { join } from 'path'
 import { promisify } from 'util'
 import { statSync } from 'node:fs'
 import { toast } from 'react-toastify'
+import mpv from 'node-mpv'
+import EventEmitter from 'node:events'
 
 const execAsync = promisify(exec)
 
-class AudioPlayer {
+class AudioPlayer extends EventEmitter {
   constructor() {
+    super()
     this.sound = null
     this.queue = []
     this.isPlaying = false
     this.volume = 0.02
     this.tempFiles = new Set()
     this.listeners = new Set()
+    this.time = null
+    setInterval(() => {
+      if (this.isPlaying) {
+        this.getCurrentTime()
+        this.getDuration()
+      }
+    }, 1000) // Update every second
   }
 
   addListener(callback) {
@@ -23,58 +33,37 @@ class AudioPlayer {
     return () => this.listeners.delete(callback)
   }
 
-  async downloadAudio(url) {
-    let ytDlpPath = 'yt-dlp'
-
-    const idResult = spawnSync(ytDlpPath, ['--print', 'filename', '-o', '%(id)s.mp3', url])
-    const idTempPath = join(tmpdir(), idResult.stdout.toString().trim())
-    const tempPath = join(tmpdir(), `%(id)s.mp3`)
-    const command = `yt-dlp -x --audio-format mp3 -o "${tempPath}" ${url}`
-
-    try {
-      try {
-        const existingFile = statSync(idTempPath)
-        if (existingFile) {
-          this.tempFiles.add(idTempPath)
-          return idTempPath
-        }
-      } catch (error) {
-        console.log('Error checking for existing file')
-      }
-
-      await execAsync(command)
-      this.tempFiles.add(tempPath)
-      return idTempPath
-    } catch (error) {
-      console.error('Error downloading audio:', error)
-      throw error
-    }
-  }
+  async downloadAudio(url) {}
 
   async play(url) {
     try {
       console.log('is playing: ', this.isPlaying)
 
-      const localPath = await this.downloadAudio(url)
+      const command = `mpv --no-video --input-ipc-server=\\\\.\\pipe\\mpv-pipe "${url}"`
 
-      this.sound = new Howl({
-        src: [localPath],
-        html5: true,
-        volume: this.volume,
-        onplay: () => {
+      await exec(command)
+
+      this.sound = new mpv({
+        audio_only: true,
+        debug: false,
+        socket: '\\\\.\\pipe\\mpv-pipe', // Windows
+        time_update: 1,
+        verbose: false
+      })
+        .on('started', () => {
           this.isPlaying = true
-        },
-        onend: () => {
+          this.emit('started')
+          console.log('Started playing audio', this.isPlaying)
+        })
+        .on('stopped', () => {
           this.isPlaying = false
           this.playNext()
-        },
-        onloaderror: (id, error) => {
-          console.error('Error loading audio:', error)
-          this.playNext()
-        }
-      })
+        })
+        .on('statuschange', () => {
+          this.getCurrentTime()
+          this.getDuration()
+        })
 
-      this.sound.play()
       this.currentUrl = url
     } catch (error) {
       console.error('Error playing audio:', error)
@@ -83,11 +72,9 @@ class AudioPlayer {
   }
 
   async setVolume(value) {
-    if (value >= 0 && value <= 1) {
-      this.volume = value
-      if (this.sound) {
-        this.sound.volume(value)
-      }
+    if (this.isPlaying) {
+      console.log('Setting volume to', value)
+      this.sound.setProperty('volume', value)
     }
   }
 
@@ -106,9 +93,8 @@ class AudioPlayer {
   }
 
   stop() {
-    if (this.sound) {
+    if (this.isPlaying) {
       this.sound.stop()
-      this.sound = null
     }
     this.isPlaying = false
     this.queue = []
@@ -129,16 +115,18 @@ class AudioPlayer {
   }
 
   getCurrentTime() {
-    if (!this.isPlaying || !this.sound) {
-      return null
+    if (this.isPlaying) {
+      this.sound.getProperty('playback-time').then((time) => {
+        this.emit('timeupdate', time)
+      })
     }
+  }
 
-    const duration = this.sound.duration()
-    const currentTime = this.sound.seek()
-    return {
-      current: currentTime,
-      total: duration,
-      formatted: this.formatTime(currentTime)
+  getDuration() {
+    if (this.isPlaying) {
+      this.sound.getProperty('duration').then((duration) => {
+        this.emit('duration', duration)
+      })
     }
   }
 

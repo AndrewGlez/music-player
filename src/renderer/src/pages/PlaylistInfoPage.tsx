@@ -64,6 +64,7 @@ const PlaylistInfoPage: React.FC = () => {
         if (audioPlayer.isPlaying) {
             audioPlayer.stop()
         } else {
+            console.log(song.thumbnailUrl)
             setCurrentSong({
                 title: song.title,
                 artist: song.artist ?? "Unknown artist",

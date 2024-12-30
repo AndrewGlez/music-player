@@ -27,47 +27,47 @@ export default function PlayerInterface() {
 
   useEffect(() => {
     // Add listener for audio player state changes
-    const unsubscribe = audioPlayer.addListener(({ isPlaying, currentTime }) => {
-      if (currentTime) {
-        setCurrentTime(currentTime.current)
-        setDuration(currentTime.total)
-      }
-      setIsPlaying(isPlaying)
-    })
 
+    audioPlayer?.on('started', () => setIsPlaying(true))
     // Initial state
     setIsPlaying(audioPlayer.isPlaying)
-    const timeInfo = audioPlayer.getCurrentTime()
-    if (timeInfo) {
-      setCurrentTime(timeInfo.current)
-      setDuration(timeInfo.total)
-    }
-    const interval = setInterval(() => {
-      const timeInfo = audioPlayer.getCurrentTime()
-      if (timeInfo) {
-        setCurrentTime(timeInfo.current)
-        setDuration(timeInfo.total)
-      }
-    }, 1000) // Update every second
 
+    audioPlayer?.on('stopped', () => setIsPlaying(false))
+
+  }, [])
+
+  useEffect(() => {
+    const updateTime = (time) => {
+      setCurrentTime(time)
+    }
+
+    const updateDuration = (time) => {
+      setDuration(time)
+    }
+
+    audioPlayer.on('timeupdate', updateTime)
+    audioPlayer.on('duration', updateDuration)
+
+    // Clean up the event listener on component unmount
     return () => {
-      clearInterval(interval)
-      unsubscribe()
+      audioPlayer.off('timeupdate', updateTime)
+      audioPlayer.off('duration', updateDuration)
     }
   }, [])
 
   const handlePlayPause = () => {
     if (isPlaying) {
       audioPlayer.pause()
+      setIsPlaying(false)
     } else {
       audioPlayer.resume()
+      setIsPlaying(true)
     }
   }
 
-
   const handleVolumeChange = (e) => {
     const newVolume = parseInt(e.target.value)
-    const normalizedVolume = newVolume / 100 // Convert to 0-1 range
+    const normalizedVolume = newVolume // Convert to 0-1 range
     audioPlayer.setVolume(normalizedVolume)
     setVolume(newVolume)
   }
@@ -91,11 +91,10 @@ export default function PlayerInterface() {
             ) : (
               <Music className="w-10 h-10" />
             )}
-            <div >
+            <div>
               <h2 className="text-sm font-semibold">{currentSong?.title || 'No track playing'}</h2>
               <p className="text-xs text-gray-300">{currentSong?.artist || 'Unknown artist'}</p>
             </div>
-
           </div>
 
           <div className="flex flex-col items-center w-1/2 mx-10">
