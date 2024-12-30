@@ -9,8 +9,13 @@ import RegisterPage from './pages/RegisterPage'
 import { Route, Routes } from 'react-router-dom'
 import PlaylistInfoPage from './pages/PlaylistInfoPage'
 import FindUsersOnline from './pages/OnlinePage'
-
+import audioPlayer from './stream'
+import { useEffect } from 'react'
+import Mousetrap from 'mousetrap'
 function App(): JSX.Element {
+  Mousetrap.bind(['command+r', 'ctrl+r', 'f5'], function () {
+    return false
+  });
   return (
     <PlayerProvider>
       <AuthProvider>
@@ -21,6 +26,9 @@ function App(): JSX.Element {
 }
 
 function AppContent(): JSX.Element {
+  useEffect(() => {
+    audioPlayer.connectWithIpc()
+  }, [])
   return (
     <div>
       <div className="flex flex-col h-screen w-full">

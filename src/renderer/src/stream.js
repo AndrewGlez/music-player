@@ -24,6 +24,7 @@ class AudioPlayer extends EventEmitter {
       if (this.isPlaying) {
         this.getCurrentTime()
         this.getDuration()
+        this.connectWithIpc()
       }
     }, 1000) // Update every second
   }
@@ -33,7 +34,37 @@ class AudioPlayer extends EventEmitter {
     return () => this.listeners.delete(callback)
   }
 
-  async downloadAudio(url) {}
+  async connectWithIpc() {
+    if (this.isPlaying) return
+
+    try {
+      this.sound = new mpv({
+        audio_only: true,
+        debug: false,
+        socket: '\\\\.\\pipe\\mpv-pipe', // Windows
+        time_update: 1,
+        verbose: false
+      })
+        .on('started', () => {
+          this.isPlaying = true
+          this.emit('started')
+          console.log('Started playing audio', this.isPlaying)
+        })
+        .on('stopped', () => {
+          this.isPlaying = false
+          this.playNext()
+        })
+        .on('statuschange', () => {
+          this.getCurrentTime()
+          this.getDuration()
+        })
+
+      this.currentUrl = url
+    } catch (error) {
+      console.error('Error connecting with ipc:', error)
+      throw error
+    }
+  }
 
   async play(url) {
     try {

@@ -34,7 +34,7 @@ export default function PlayerInterface() {
 
     audioPlayer?.on('stopped', () => setIsPlaying(false))
 
-  }, [])
+  }, [audioPlayer.isPlaying])
 
   useEffect(() => {
     const updateTime = (time) => {

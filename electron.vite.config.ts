@@ -22,7 +22,8 @@ const commonjsPackages = [
   'dotenv',
   'node:fs',
   'stompjs',
-  'node:events'
+  'node:events',
+  'mousetrap'
 ] as const
 export default defineConfig({
   main: {
