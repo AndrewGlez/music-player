@@ -72,7 +72,7 @@ class AudioPlayer extends EventEmitter {
 
       const command = `mpv --no-video --input-ipc-server=\\\\.\\pipe\\mpv-pipe "${url}"`
 
-      await exec(command)
+      await execAsync(command)
 
       this.sound = new mpv({
         audio_only: true,
@@ -159,6 +159,10 @@ class AudioPlayer extends EventEmitter {
         this.emit('duration', duration)
       })
     }
+  }
+
+  async quit() {
+    this.sound.quit()
   }
 
   formatTime(seconds) {

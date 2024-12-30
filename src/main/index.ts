@@ -3,6 +3,8 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import * as fs from 'fs/promises'
+import audioPlayer from '../renderer/src/stream.js'
+import { spawn } from 'child_process'
 
 function createWindow(): void {
   // Create the browser window.
@@ -85,6 +87,13 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
+  if (process.platform == 'win32') {
+    spawn('taskkill', ['/f', '/im', 'mpv.exe'])
+  }
+  if (process.platform == 'linux') {
+    spawn('pkill', ['mpv'])
+  }
+
   if (process.platform !== 'darwin') {
     app.quit()
   }

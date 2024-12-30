@@ -100,6 +100,15 @@ export default function SearchPage() {
   const handleSongClick = (song) => {
     if (audioPlayer.isPlaying) {
       audioPlayer.stop()
+      audioPlayer.enqueue(song.url)
+      setCurrentSong({
+        title: song.title,
+        artist: song.artist ?? "Unknown artist",
+        thumbnail: song.thumbnailUrl,
+        url: song.url,
+        id: song.id,
+        durationFormatted: song.durationFormatted
+      })
     } else {
       setCurrentSong({
         title: song.title,
