@@ -7,7 +7,7 @@ import audioPlayer from '@/stream.js'
 import { usePlayer } from '@/context/PlayerContext'
 import { Spinner } from '@/components/ui/spinner'
 import axios from 'axios'
-import BACKEND_URL from '@/config'
+import { BACKEND_PORT, BACKEND_URL, config } from '@/config'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   ContextMenu,
@@ -84,7 +84,7 @@ export default function SearchPage() {
   const getPlaylists = async () => {
     const user_id = localStorage.getItem('user_id')
 
-    axios.get(`http://${BACKEND_URL}:8080/api/users/${user_id}`).then((res) => {
+    axios.get(`http://${config.BACKEND_URL}:${config.BACKEND_PORT}/api/users/${user_id}`).then((res) => {
       setPlaylists(res.data.playlists)
     })
   }
@@ -119,7 +119,7 @@ export default function SearchPage() {
         durationFormatted: song.durationFormatted
       })
       audioPlayer.enqueue(song.url)
-      axios.post(`http://${BACKEND_URL}:8080/api/songs/add`, {
+      axios.post(`http://${config.BACKEND_URL}:${config.BACKEND_PORT}/api/songs/add`, {
         ytId: song.id,
         title: song.title,
         artist: song.channel.name,
@@ -134,7 +134,7 @@ export default function SearchPage() {
 
   const handlePlaylistDialog = async (song: Song) => {
     console.log(song)
-    axios.post(`http://${BACKEND_URL}:8080/api/songs/add`, {
+    axios.post(`http://${config.BACKEND_URL}:${config.BACKEND_PORT}/api/songs/add`, {
       ytId: song.id,
       title: song.title,
       artist: song.channel.name,
@@ -163,7 +163,7 @@ export default function SearchPage() {
 
   const handleAddSong = async (playlistId: string) => {
     console.log(savedSong)
-    axios.post(`http://${BACKEND_URL}:8080/api/playlists/${playlistId}/addSong/${savedSong?.id}`)
+    axios.post(`http://${config.BACKEND_URL}:${config.BACKEND_PORT}/api/playlists/${playlistId}/addSong/${savedSong?.id}`)
       .then((r) => {
         if (r.status == 200) {
           toast.success("Song saved successfully")

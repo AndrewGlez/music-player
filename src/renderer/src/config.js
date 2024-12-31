@@ -1,3 +1,4 @@
-const BACKEND_URL = 'localhost'
-
-export default BACKEND_URL
+export const config = {
+  BACKEND_URL: 'localhost',
+  BACKEND_PORT: '8082'
+}

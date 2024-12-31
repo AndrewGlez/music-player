@@ -1,5 +1,5 @@
 import Stomp from 'stompjs'
-import BACKEND_URL from './config'
+import { config } from '@/config'
 
 class WebSocketClient {
   constructor() {
@@ -7,7 +7,7 @@ class WebSocketClient {
   }
 
   connect(clientId) {
-    this.client = Stomp.overWS(`ws://${BACKEND_URL}:8080/online-users`)
+    this.client = Stomp.overWS(`ws://${config.BACKEND_URL}:${config.BACKEND_PORT}/online-users`)
 
     var headers = {
       'client-id': 'client1'

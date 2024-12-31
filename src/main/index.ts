@@ -1,7 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { spawn } from 'child_process'
+import { exec, spawn } from 'child_process'
 
 function createWindow(): void {
   // Create the browser window.
@@ -44,6 +44,14 @@ function createWindow(): void {
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
+
+  let socket = '/tmp/mpvsocket'
+
+  if (process.platform === 'win32') {
+    socket = '\\\\.\\pipe\\mpv-pipe'
+  }
+
+  exec(`mpv --no-video --input-ipc-server=${socket} --idle=yes`)
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

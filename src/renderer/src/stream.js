@@ -18,13 +18,7 @@ class AudioPlayer extends EventEmitter {
     this.tempFiles = new Set()
     this.listeners = new Set()
     this.time = null
-    setInterval(() => {
-      if (this.isPlaying) {
-        this.getCurrentTime()
-        this.getDuration()
-        this.connectWithIpc()
-      }
-    }, 1000) // Update every second
+    this.connected = false
   }
 
   addListener(callback) {
@@ -34,6 +28,7 @@ class AudioPlayer extends EventEmitter {
 
   async connectWithIpc() {
     if (this.isPlaying) return
+    if (this.connected) return
     let socket = '/tmp/mpvsocket'
 
     if (process.platform === 'win32') {
@@ -60,6 +55,7 @@ class AudioPlayer extends EventEmitter {
         .on('statuschange', () => {
           this.getCurrentTime()
           this.getDuration()
+          this.connected = true
         })
     } catch (error) {
       console.error('Error connecting with ipc:', error)
@@ -70,38 +66,55 @@ class AudioPlayer extends EventEmitter {
   async play(url) {
     try {
       console.log('is playing: ', this.isPlaying)
+
       let socket = '/tmp/mpvsocket'
 
       if (process.platform === 'win32') {
         socket = '\\\\.\\pipe\\mpv-pipe'
       }
 
-      const command = `mpv --no-video --input-ipc-server=${socket} "${url}"`
-      console.log('platform', process.platform, 'using', socket)
-      exec(command)
-
-      this.sound = new mpv({
-        audio_only: true,
-        debug: true,
-        socket: socket, // Windows
-        time_update: 1,
-        verbose: false
+      // Create a promise that resolves when the audio starts
+      const playPromise = new Promise((resolve, reject) => {
+        this.sound = new mpv({
+          audio_only: true,
+          debug: false,
+          socket: socket, // Windows
+          time_update: 1,
+          verbose: false
+        })
+          .on('started', () => {
+            this.isPlaying = true
+            this.emit('started')
+            console.log('Started playing audio', this.isPlaying)
+            resolve() // Resolve the promise here
+          })
+          .on('stopped', () => {
+            this.isPlaying = false
+            this.playNext()
+          })
+          .on('statuschange', () => {
+            this.getCurrentTime()
+            this.getDuration()
+          })
       })
-        .on('started', () => {
-          this.isPlaying = true
-          this.emit('started')
-          console.log('Started playing audio', this.isPlaying)
-        })
-        .on('stopped', () => {
-          this.isPlaying = false
-          this.playNext()
-        })
-        .on('statuschange', () => {
-          this.getCurrentTime()
-          this.getDuration()
-        })
+      toast.promise(
+        playPromise,
+        {
+          pending: 'Connecting with mpv...',
+          success: 'Connected',
+          error: 'An error ocurred when connecting'
+        },
+        { pauseOnHover: false, theme: 'dark' }
+      )
 
+      let command = {
+        command: ['loadfile', url]
+      }
+
+      this.sound.commandJSON(command)
       this.currentUrl = url
+
+      return playPromise // Return the promise
     } catch (error) {
       console.error('Error playing audio:', error)
       throw error

@@ -5,3 +5,4 @@ out
 *.log*
 electron.vite.config.1735403576889.mjs
 pnpm-lock.yaml
+mpv.ipc.ps1

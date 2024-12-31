@@ -28,8 +28,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import { Label } from './ui/label'
 import { Textarea } from './ui/textarea'
 import { useNavigate } from 'react-router-dom'
-import BACKEND_URL from '@/config'
 import PlaylistIcon from './PlaylistIcon' // Import the new SVG component
+import { config } from '@/config'
 
 interface Playlist {
   id: number
@@ -64,7 +64,7 @@ export default function MusicPlayerNavbar() {
   const getPlaylists = async () => {
     const user_id = localStorage.getItem('user_id')
 
-    axios.get(`http://${BACKEND_URL}:8080/api/users/${user_id}`).then((res) => {
+    axios.get(`http://${config.BACKEND_URL}:${config.BACKEND_PORT}/api/users/${user_id}`).then((res) => {
       setUser(res.data)
       setPlaylists(res.data.playlists)
     })
@@ -84,7 +84,7 @@ export default function MusicPlayerNavbar() {
 
   const handleDelete = (e: React.FormEvent, id: number) => {
     e.preventDefault();
-    axios.delete(`http://${BACKEND_URL}:8080/api/playlists/${id}`).then((res) => {
+    axios.delete(`http://${config.BACKEND_URL}:${config.BACKEND_PORT}/api/playlists/${id}`).then((res) => {
       setPlaylists(prevPlaylists => prevPlaylists.filter(playlist => playlist.id !== id))
       console.log('Playlist deleted:', res.data)
       toast('Success')
@@ -100,7 +100,7 @@ export default function MusicPlayerNavbar() {
       return
     }
     // Here you would typically send the data to your backend
-    axios.post(`http://${BACKEND_URL}:8080/api/playlists/create`, {
+    axios.post(`http://${config.BACKEND_URL}:${config.BACKEND_PORT}/api/playlists/create`, {
       title: name,
       description: description,
       userid: localStorage.getItem('user_id')

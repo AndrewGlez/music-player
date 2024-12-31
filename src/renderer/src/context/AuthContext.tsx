@@ -2,7 +2,7 @@ import axios from 'axios'
 import React, { createContext, useState, useContext, useEffect } from 'react'
 import jwt from 'jsonwebtoken'
 import PlayerInterface from '@/components/player-interface'
-import BACKEND_URL from '@/config'
+import { config } from '@/config'
 
 import { Spinner } from '@/components/ui/spinner'
 
@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (token) {
       setIsAuthenticated(true)
     }
-    axios.get(`http://${BACKEND_URL}:8080/actuator/health`).then((res) => {
+    axios.get(`http://${config.BACKEND_URL}:${config.BACKEND_PORT}/actuator/health`).then((res) => {
       if (res.data.status == "UP") {
         setLoading(false)
       }
@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     await axios
-      .post(`http://${BACKEND_URL}:8080/api/users/login`, {
+      .post(`http://${config.BACKEND_URL}:${config.BACKEND_PORT}/api/users/login`, {
         email: email,
         password: password
       })

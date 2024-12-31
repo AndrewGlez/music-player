@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import BACKEND_URL from '@/config'
+import { BACKEND_PORT, BACKEND_URL, config } from '@/config'
 import { Trash2Icon, User } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { AiOutlineSpotify } from 'react-icons/ai'
@@ -42,11 +42,11 @@ const PlaylistInfoPage: React.FC = () => {
 
   const fetchSongs = async () => {
     try {
-      await axios.get(`http://${BACKEND_URL}:8080/api/playlists/${playlistId}`).then((res) => {
+      await axios.get(`http://${config.BACKEND_URL}:${config.BACKEND_PORT}/api/playlists/${playlistId}`).then((res) => {
         setPlaylist(res.data)
       })
       axios
-        .get(`http://${BACKEND_URL}:8080/api/users/${localStorage.getItem('user_id')}`)
+        .get(`http://${config.BACKEND_URL}:${config.BACKEND_PORT}/api/users/${localStorage.getItem('user_id')}`)
         .then((res) => {
           setUsername(res.data.username)
         })
@@ -86,7 +86,7 @@ const PlaylistInfoPage: React.FC = () => {
   }
   const handleDeleteSong = (playlistId: number, songId: string) => {
     axios
-      .delete(`http://${BACKEND_URL}:8080/api/playlists/${playlistId}/deleteSong/${songId}`)
+      .delete(`http://${config.BACKEND_URL}:${config.BACKEND_PORT}/api/playlists/${playlistId}/deleteSong/${songId}`)
       .then(async (res) => {
         console.log(res.data)
         await fetchSongs()
