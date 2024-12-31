@@ -34,6 +34,7 @@ import {
 } from '@/components/ui/select'
 import { toast, ToastContainer } from 'react-toastify'
 import { config } from '@/config'
+import { useParams } from 'react-router-dom'
 
 interface Song {
   title: string
@@ -85,6 +86,7 @@ export default function SearchPage() {
   const [playlists, setPlaylists] = useState<Playlist[]>()
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist>()
   const [savedSong, setSavedSong] = useState<SavedSong | null>(null)
+  const { searchQuery } = useParams();
 
   const getPlaylists = async () => {
     const user_id = localStorage.getItem('user_id')
@@ -96,13 +98,16 @@ export default function SearchPage() {
       })
   }
   useEffect(() => {
-    const search = window.location.href.split('=')[1].replaceAll('%20', ' ')
+
+    console.log(searchQuery)
+
     setLoading(true)
-    query(search).then((data) => {
+    query(searchQuery).then((data) => {
       setSongs(data as any)
       setLoading(false)
     })
-  }, [])
+  }, [searchQuery])
+
 
   const handleSongClick = (song) => {
     if (audioPlayer.isPlaying) {
@@ -231,7 +236,6 @@ export default function SearchPage() {
                       open={isDialogOpen}
                       onOpenChange={() => {
                         setIsDialogOpen(!isDialogOpen)
-                        
                       }}
                     >
                       <DialogContent className="sm:max-w-md">

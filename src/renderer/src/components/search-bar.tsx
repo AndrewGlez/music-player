@@ -1,13 +1,15 @@
 import { Search } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function SearchBar() {
-    const [query, setQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
+    const navigate = useNavigate()
 
     const handleSubmit = (e) => {
-        if (query === "") return;
+        if (searchQuery === "") return;
         e.preventDefault();
-        window.location.href = `/search?q=${query}`;
+        navigate(`/search/${searchQuery}`);
     };
 
     return (
@@ -20,8 +22,8 @@ export default function SearchBar() {
                     <Search className="h-4 w-4 text-white/70" />
                     <input
                         type="text"
-                        onChange={(e) => setQuery(e.target.value)}
-                        value={query}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        value={searchQuery}
                         placeholder="Search"
                         className="flex-1 my-2 rounded-3xl bg-transparent text-sm text-white placeholder:text-white/70 focus:outline-none"
                     />

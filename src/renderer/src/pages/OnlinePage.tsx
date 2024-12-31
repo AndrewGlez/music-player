@@ -6,7 +6,6 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Music, Clock, Headphones } from 'lucide-react'
 import '../assets/background.css'
 import WaveDots from '@/components/waves'
-import wsclient from '@/wsclient'
 
 interface User {
     id: string
@@ -20,12 +19,6 @@ export default function FindUsersOnline() {
     const [users, setUsers] = useState<User[]>([])
 
     useEffect(() => {
-        const user_id = localStorage.getItem("user_id")
-        wsclient.connect(user_id)
-        setTimeout(() => {
-            wsclient.suscribeTo("/topic/online")
-            wsclient.sendTo("/app/end1", "Hellow")
-        }, 1000);
 
 
         // Simulating fetching users data

@@ -19,8 +19,7 @@ const PlayerContext = createContext<PlayerContextType | undefined>(undefined)
 export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [currentSong, setCurrentSong] = useState<SongInfo | null>(null)
 
-  console.log("Now playing:")
-  console.log(currentSong)
+
 
   return (
     <PlayerContext.Provider value={{ currentSong, setCurrentSong }}>

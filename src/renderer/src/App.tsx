@@ -12,6 +12,7 @@ import FindUsersOnline from './pages/OnlinePage'
 import audioPlayer from './stream'
 import { useEffect, useState } from 'react'
 import Mousetrap from 'mousetrap'
+import wsclient from './wsclient'
 function App(): JSX.Element {
   Mousetrap.bind(['command+r', 'ctrl+r', 'f5'], function () {
     return false
@@ -26,15 +27,23 @@ function App(): JSX.Element {
 }
 
 function AppContent(): JSX.Element {
+  const user_id = localStorage.getItem('user_id')
   const [connected, setConnected] = useState(false)
+
   useEffect(() => {
+
+
     if (!connected) {
       setConnected(true)
       audioPlayer.connectWithIpc()
+      wsclient.connect(user_id)
+      wsclient.suscribeTo("/topic/online")
     }
     window.onload = () => {
       setConnected(true)
       audioPlayer.connectWithIpc()
+      wsclient.connect(user_id)
+      wsclient.suscribeTo("/topic/online")
     }
   }, [])
   return (
@@ -56,7 +65,7 @@ function AppContent(): JSX.Element {
               }
             />
             <Route
-              path="search"
+              path="search/:searchQuery"
               element={
                 <ProtectedRoute>
                   <>

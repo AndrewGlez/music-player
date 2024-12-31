@@ -4,28 +4,20 @@ import { config } from '@/config'
 class WebSocketClient {
   constructor() {
     this.client = undefined
+    this.connected = false
   }
 
   connect(clientId) {
     this.client = Stomp.overWS(`ws://${config.BACKEND_URL}:${config.BACKEND_PORT}/online-users`)
 
-    var headers = {
-      'client-id': 'client1'
-    }
-    this.client.connect(
-      {
-        clientId: clientId
-      },
-      () => {
-        console.log('Connected to STOMP broker')
-      }
-    )
+    this.client.connect()
   }
   suscribeTo(topic) {
+    if (!this.connected) return
     this.client.subscribe(topic, (message) => {})
   }
   sendTo(topic, message) {
-    const m = this.client.send(topic, {}, 'Hello, STOMP!')
+    const m = this.client.send(topic, {}, message)
   }
 }
 

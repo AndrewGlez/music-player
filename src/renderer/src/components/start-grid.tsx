@@ -37,7 +37,8 @@ export default function StartGrid() {
 
   const handleSearch = (e) => {
     e.preventDefault()
-    navigate(`/search?q=${searchQuery}`)
+    console.log(searchQuery)
+    navigate(`/search/${searchQuery}`)
   }
 
   return (
