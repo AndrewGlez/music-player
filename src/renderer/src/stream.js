@@ -8,8 +8,6 @@ import { toast } from 'react-toastify'
 import mpv from 'node-mpv'
 import EventEmitter from 'node:events'
 
-const execAsync = promisify(exec)
-
 class AudioPlayer extends EventEmitter {
   constructor() {
     super()
@@ -36,12 +34,17 @@ class AudioPlayer extends EventEmitter {
 
   async connectWithIpc() {
     if (this.isPlaying) return
+    let socket = '/tmp/mpvsocket'
+
+    if (process.platform === 'win32') {
+      socket = '\\\\.\\pipe\\mpv-pipe'
+    }
 
     try {
       this.sound = new mpv({
         audio_only: true,
         debug: false,
-        socket: '\\\\.\\pipe\\mpv-pipe', // Windows
+        socket: socket, // Windows
         time_update: 1,
         verbose: false
       })
@@ -58,8 +61,6 @@ class AudioPlayer extends EventEmitter {
           this.getCurrentTime()
           this.getDuration()
         })
-
-      this.currentUrl = url
     } catch (error) {
       console.error('Error connecting with ipc:', error)
       throw error
@@ -76,12 +77,12 @@ class AudioPlayer extends EventEmitter {
       }
 
       const command = `mpv --no-video --input-ipc-server=${socket} "${url}"`
-
-      await execAsync(command)
+      console.log('platform', process.platform, 'using', socket)
+      exec(command)
 
       this.sound = new mpv({
         audio_only: true,
-        debug: false,
+        debug: true,
         socket: socket, // Windows
         time_update: 1,
         verbose: false

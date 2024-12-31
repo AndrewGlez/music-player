@@ -1,5 +1,4 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { spawn } from 'child_process'
@@ -16,7 +15,6 @@ function createWindow(): void {
       nodeIntegration: true,
       contextIsolation: false,
       nodeIntegrationInWorker: true,
-      preload: join(__dirname, '../preload/index.ts'),
       sandbox: false,
       webSecurity: false
     }
@@ -36,7 +34,7 @@ function createWindow(): void {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(`${__dirname}/../renderer/index.html`, { hash: 'login' })
   }
 }
 

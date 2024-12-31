@@ -250,7 +250,7 @@ export default function MusicPlayerNavbar() {
 
           {filteredPlaylists.map((playlist, index) => (
             <React.Fragment key={playlist.title}>
-              <a href={`/playlist?p=${playlist.id}`} className="flex items-center py-2 px-4 hover:bg-[#232323] rounded-md cursor-pointer">
+              <a onClick={() => navigate(`/playlist/${playlist.id}`, { replace: true })} className="flex items-center py-2 px-4 hover:bg-[#232323] rounded-md cursor-pointer">
                 <PlaylistIcon />
                 <div>
                   <div className="ml-3 font-medium">{playlist.title}</div>

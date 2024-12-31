@@ -15,7 +15,7 @@ import Mousetrap from 'mousetrap'
 function App(): JSX.Element {
   Mousetrap.bind(['command+r', 'ctrl+r', 'f5'], function () {
     return false
-  });
+  })
   return (
     <PlayerProvider>
       <AuthProvider>
@@ -58,7 +58,7 @@ function AppContent(): JSX.Element {
                 </ProtectedRoute>
               }
             />
-            <Route path="/playlist" element={
+            <Route path="/playlist/:playlistId" element={
               <ProtectedRoute>
                 <>
                   <MusicPlayerNavbar />
@@ -66,14 +66,17 @@ function AppContent(): JSX.Element {
                 </>
               </ProtectedRoute>} />
 
-            <Route path="/online-users" element={
-              <ProtectedRoute>
-                <>
-                  <MusicPlayerNavbar />
-                  <FindUsersOnline />
-                </>
-              </ProtectedRoute>} />
-
+            <Route
+              path="/online-users"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <MusicPlayerNavbar />
+                    <FindUsersOnline />
+                  </>
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </div>
       </div>

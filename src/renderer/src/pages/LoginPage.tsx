@@ -75,7 +75,7 @@ export default function LoginPage() {
         </div>
         <p className="mt-6 text-center text-sm text-gray-600">
           {` Don't have an account?  `}
-          <a href="/register" className="text-purple-600 hover:underline">
+          <a onClick={() => navigate('/register')} className="text-purple-600 hover:underline">
             Sign up
           </a>
         </p>
