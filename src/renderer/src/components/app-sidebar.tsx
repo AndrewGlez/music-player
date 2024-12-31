@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { ChevronRightCircleIcon, History, Library, LogOut, Plus, Search, Settings, Trash2Icon, User, UserRoundSearchIcon } from 'lucide-react'
+import { ChevronRightCircleIcon, Library, LogOut, Plus, Search, Settings, Trash2Icon, User, UserRoundSearchIcon } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
@@ -48,14 +48,7 @@ interface User {
   playlists: Playlist[]
 }
 
-interface Song {
-  id: string
-  playlistId: string
-  title: string
-  artist: string
-  url: string
-  thumb: string
-}
+
 
 export default function MusicPlayerNavbar() {
   const [isSearching, setIsSearching] = useState(true)

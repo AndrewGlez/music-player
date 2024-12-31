@@ -1,5 +1,15 @@
 import { useState } from 'react'
 
+declare global {
+  interface Window {
+    electron: {
+      process: {
+        versions: { [key: string]: string }
+      }
+    }
+  }
+}
+
 function Versions(): JSX.Element {
   const [versions] = useState(window.electron.process.versions)
 

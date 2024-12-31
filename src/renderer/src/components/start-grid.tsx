@@ -1,4 +1,4 @@
-import { useState, React } from 'react'
+import { useState } from 'react'
 import { Music, Mic2, Radio, Headphones, Guitar, Drum, Piano, Disc3, Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'

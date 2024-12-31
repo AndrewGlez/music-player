@@ -1,8 +1,7 @@
-import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import * as fs from 'fs/promises'
 import { spawn } from 'child_process'
 
 function createWindow(): void {
@@ -64,21 +63,6 @@ app.whenReady().then(() => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
-
-  ipcMain.handle('dialog:openFile', async () => {
-    const { canceled, filePaths } = await dialog.showOpenDialog({
-      properties: ['openFile'],
-      filters: [{ name: 'Images', extensions: ['jpg', 'png', 'gif', 'svg'] }]
-    })
-    if (!canceled) {
-      return filePaths[0]
-    }
-  })
-
-  ipcMain.handle('file:read', async (_, filePath) => {
-    const data = await fs.readFile(filePath)
-    return `data:image/png;base64,${data.toString('base64')}`
   })
 })
 

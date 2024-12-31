@@ -1,5 +1,4 @@
 import {
-  Heart,
   Repeat,
   Shuffle,
   SkipBack,
@@ -11,16 +10,13 @@ import {
   Volume2,
   Music
 } from 'lucide-react'
-import * as React from 'react'
 import { useState, useEffect } from 'react'
 import audioPlayer from '../stream.js'
 import { usePlayer } from '@/context/PlayerContext'
-import axios from 'axios'
-import BACKEND_URL from '@/config.js'
+
 export default function PlayerInterface() {
   const { currentSong } = usePlayer()
   const [isPlaying, setIsPlaying] = useState(false)
-  const [isFavorite, setIsFavorite] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [volume, setVolume] = useState(50)
