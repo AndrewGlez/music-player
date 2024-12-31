@@ -100,11 +100,11 @@ class AudioPlayer extends EventEmitter {
       toast.promise(
         playPromise,
         {
-          pending: 'Connecting with mpv...',
+          pending: '🔎 Connecting with mpv...',
           success: 'Connected',
           error: 'An error ocurred when connecting'
         },
-        { pauseOnHover: false, theme: 'dark' }
+        { pauseOnHover: false, theme: 'dark', closeOnClick: true }
       )
 
       let command = {
@@ -123,7 +123,6 @@ class AudioPlayer extends EventEmitter {
 
   async setVolume(value) {
     if (this.isPlaying) {
-      console.log('Setting volume to', value)
       this.sound.setProperty('volume', value)
     }
   }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { BACKEND_PORT, BACKEND_URL, config } from '@/config'
+import { config } from '@/config'
 import { Trash2Icon, User } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { AiOutlineSpotify } from 'react-icons/ai'
@@ -100,7 +100,7 @@ const PlaylistInfoPage: React.FC = () => {
       <div className="px-6 py-14">
         <div className="space-y-4">
           <div>
-            <h1 className="text-3xl font-bold font-[LexendPeta] text-white md:text-5xl">
+            <h1 className="text-3xl font-bold uppercase font-[Montserrat] text-white md:text-5xl">
               {playlist?.title}
             </h1>
             <span className="text-sm font-thin text-zinc-400">{playlist?.description}</span>
@@ -108,7 +108,7 @@ const PlaylistInfoPage: React.FC = () => {
             <div className="mt-2 flex items-center gap-2">
               <Avatar className="h-6 w-6">
                 <AvatarFallback>
-                  <User className="p-1"></User>
+                  <User className="p-1" ></User>
                 </AvatarFallback>
               </Avatar>
               <span className="text-sm text-white">{username}</span>

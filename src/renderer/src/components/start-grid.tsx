@@ -3,6 +3,7 @@ import { Music, Mic2, Radio, Headphones, Guitar, Drum, Piano, Disc3, Search } fr
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useNavigate } from 'react-router-dom'
+import { ScrollArea } from '@radix-ui/react-scroll-area'
 
 const genres = [
   { name: 'Pop', icon: Music, gradient: 'from-pink-500 to-rose-500', query: 'pop music' },
@@ -40,7 +41,7 @@ export default function StartGrid() {
   }
 
   return (
-    <div className="select-none dark:bg-black container mx-auto p-24">
+    <ScrollArea className="overflow-auto select-none bg-black container mx-auto p-24">
       <h2 className="text-3xl font-bold mb-6 text-center text-white">Music Player</h2>
       {/* Search Bar */}
       <form onSubmit={handleSearch} className="text-white mb-8">
@@ -60,7 +61,7 @@ export default function StartGrid() {
       </form>
 
       {/* Genre Grid */}
-      <h3 className="text-2xl font-semibold mb-4">Browse Genres</h3>
+      <h3 className="text-2xl font-semibold mb-4 text-primary-foreground">Browse Genres</h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {genres.map((genre) => (
           <div
@@ -78,6 +79,6 @@ export default function StartGrid() {
           </div>
         ))}
       </div>
-    </div>
+    </ScrollArea>
   )
 }

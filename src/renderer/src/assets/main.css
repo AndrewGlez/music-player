@@ -18,6 +18,11 @@
     font-style: serif;
     src: url('../../../../resources/LexendPeta-VariableFont_wght.ttf');
   }
+  @font-face {
+    font-family: 'Montserrat';
+    font-style: serif;
+    src: url('../../../../resources/Montserrat-VariableFont_wght.ttf');
+  }
   :root {
     --background: 0 0% 100%;
     --foreground: 224 71.4% 4.1%;
@@ -85,4 +90,8 @@
 }
 .group2:hover .group-hover\:opacity-100 {
   opacity: 1;
+}
+
+.bg-player {
+  background: url("");
 }

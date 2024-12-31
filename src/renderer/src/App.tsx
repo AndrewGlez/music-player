@@ -39,7 +39,7 @@ function AppContent(): JSX.Element {
   }, [])
   return (
     <div>
-      <div className="flex flex-col h-screen w-full">
+      <div className="pointer-events-auto flex flex-col h-screen w-full">
         <div className="flex flex-1 overflow-hidden w-full">
           <Routes>
             <Route path="/login" element={<LoginPage />} />

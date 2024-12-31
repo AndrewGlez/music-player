@@ -18,7 +18,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { randomInt } from 'crypto'
-import { BACKEND_PORT, BACKEND_URL, config } from '@/config'
+import { config } from '@/config'
 
 const countries = [
   { code: 'US', name: 'United States' },

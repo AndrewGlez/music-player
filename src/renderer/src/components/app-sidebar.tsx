@@ -87,16 +87,18 @@ export default function MusicPlayerNavbar() {
     axios.delete(`http://${config.BACKEND_URL}:${config.BACKEND_PORT}/api/playlists/${id}`).then((res) => {
       setPlaylists(prevPlaylists => prevPlaylists.filter(playlist => playlist.id !== id))
       console.log('Playlist deleted:', res.data)
-      toast('Success')
+      toast('Success', {
+        closeOnClick: true, theme: 'dark'
+      })
     })
   }
 
   const handlePlaylistClick = async (e: React.FormEvent) => {
     e.preventDefault()
     if (name.trim() === '' || description.trim() === '') {
-      toast(
-        'Playlist name is required'
-      )
+      toast.warning(
+        'Playlist name and description is required'
+        , { closeOnClick: true, theme: 'dark' })
       return
     }
     // Here you would typically send the data to your backend
@@ -109,9 +111,9 @@ export default function MusicPlayerNavbar() {
     })
 
     console.log('Creating playlist:', { name, description })
-    toast(
+    toast.success(
       " Playlist created successfully!"
-    )
+      , { closeOnClick: true, theme: 'dark' })
     setOpen(false)
     setName('')
     setDescription('')
@@ -123,13 +125,13 @@ export default function MusicPlayerNavbar() {
         <div className="flex items-center justify-between mb-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="justify-start p-0 w-24 h-10 hover:bg-primary hover:text-white">
-                <Avatar className="text-black w-8 h-8 mr-2">
+              <Button variant="ghost" className="justify-start">
+                <Avatar className="text-black w-8 h-8">
                   <AvatarFallback>
                     <User className="h-4 w-4" />
                   </AvatarFallback>
                 </Avatar>
-                <span className="font-['BebasNeue'] mt-1 text-xl hover:text-primary">{user?.username.toLocaleUpperCase()}</span>
+                <span className="font-[Montserrat] mt-1text-base hover:text-primary">{user?.username.toLocaleUpperCase()}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 bg-[#282828] text-white border-[#3e3e3e]">
