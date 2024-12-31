@@ -7,10 +7,11 @@ class WebSocketClient {
     this.connected = false
   }
 
-  connect(clientId) {
+  async connect(clientId) {
     this.client = Stomp.overWS(`ws://${config.BACKEND_URL}:${config.BACKEND_PORT}/online-users`)
 
-    this.client.connect()
+    await this.client.connect()
+    this.connected = true
   }
   suscribeTo(topic) {
     if (!this.connected) return
@@ -21,5 +22,5 @@ class WebSocketClient {
   }
 }
 
-const wsclient = new WebSocketClient()
+const wsclient = new WebSocketClient() 
 export default wsclient

@@ -1,3 +1,4 @@
+import wsclient from '@/wsclient'
 import React, { createContext, useState, useContext } from 'react'
 
 interface SongInfo {
@@ -19,8 +20,9 @@ const PlayerContext = createContext<PlayerContextType | undefined>(undefined)
 export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [currentSong, setCurrentSong] = useState<SongInfo | null>(null)
 
-
-
+  if (wsclient.connected) {
+    wsclient.sendTo("/app/end1", currentSong?.toString())
+  }
   return (
     <PlayerContext.Provider value={{ currentSong, setCurrentSong }}>
       {children}
