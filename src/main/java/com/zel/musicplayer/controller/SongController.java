@@ -28,12 +28,13 @@ public class SongController {
     }
 
     @PostMapping("/songs/add")
-    public ResponseEntity<Object> addSong(@RequestBody Song song) {
-        if (songRepository.findAll()
-                .stream()
-                .anyMatch(s -> s.getYtId().equals(song.getYtId())))
-            return new ResponseEntity<>("Song already added", HttpStatus.CONFLICT);
-        return ResponseEntity.ok(songRepository.save(song));
+    public ResponseEntity<Object> addSong(@RequestBody Song newSong) {
+        for (Song song : songRepository.findAll()) {
+            if (newSong.getYtId().equals(song.getYtId())) {
+                return new ResponseEntity<>(song, HttpStatus.ACCEPTED);
+            }
+        }
+        return ResponseEntity.ok(songRepository.save(newSong));
     }
 
 

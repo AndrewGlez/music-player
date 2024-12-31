@@ -25,8 +25,8 @@ public class PlaylistController {
         return playlistRepository.findAll();
     }
 
-    @GetMapping("/playlists?q={id}")
-    public Playlist getPlaylistById(@RequestParam int id) {
+    @GetMapping("/playlists/{id}")
+    public Playlist getPlaylistById(@PathVariable int id) {
         return playlistRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Playlist with id " + id + " not found"));
     }
 
@@ -35,8 +35,8 @@ public class PlaylistController {
         return playlistRepository.save(playlist);
     }
 
-    @PutMapping("/playlists?q={id}")
-    public Playlist updatePlaylist(@RequestParam int id, @RequestBody Playlist newPlaylist) {
+    @PutMapping("/playlists/{id}")
+    public Playlist updatePlaylist(@PathVariable int id, @RequestBody Playlist newPlaylist) {
         return playlistRepository.findById(id).map(playlist -> {
             playlist.setTitle(newPlaylist.getTitle());
             playlist.setDescription(newPlaylist.getDescription());
@@ -45,8 +45,8 @@ public class PlaylistController {
         }).orElseThrow(() -> new IllegalArgumentException("Playlist with id " + id + " not found"));
     }
 
-    @DeleteMapping("/playlists?q={id}")
-    public void deletePlaylist(@RequestParam int id) {
+    @DeleteMapping("/playlists/{id}")
+    public void deletePlaylist(@PathVariable int id) {
         playlistRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Playlist with id " + id + " not found"));
         playlistRepository.deleteById(id);
     }
@@ -60,6 +60,19 @@ public class PlaylistController {
         playlistRepository.save(playlist);
 
         return ResponseEntity.ok().body("Added song to playlist");
+
+    }
+
+    @DeleteMapping("/playlists/{id}/deleteSong/{songId}")
+    public ResponseEntity<Object> deleteSongFromPlaylist(@PathVariable Integer id, @PathVariable Integer songId) {
+
+        Playlist playlist = playlistRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Playlist with id " + id + " not found"));
+        Song song = songRepository.findById(songId).orElseThrow(() -> new IllegalArgumentException("Song with id " + songId + " not found"));
+
+        playlist.getTracks().remove(song);
+
+        playlistRepository.save(playlist);
+        return ResponseEntity.ok().body("Song deleted from playlist");
 
     }
 

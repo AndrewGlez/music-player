@@ -29,6 +29,7 @@ public class Song implements Serializable {
 
     @ManyToMany(mappedBy = "tracks")
     @JsonIgnoreProperties("tracks")
+    @JsonProperty("playlists")
     private Set<Playlist> playlistIds;
 
     @Column(name = "title", length = Integer.MAX_VALUE)
@@ -42,5 +43,8 @@ public class Song implements Serializable {
 
     @Column(name = "thumbnailUrl", length = Integer.MAX_VALUE)
     private String thumbnailUrl;
+
+    @Column(name = "duration", length = Integer.MAX_VALUE)
+    private String duration;
 
 }
