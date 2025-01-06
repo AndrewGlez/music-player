@@ -68,7 +68,7 @@ export default function StartGrid() {
           <div
             onClick={(e) => {
               e.preventDefault()
-              navigate(`/search?q=${genre.query}`)
+              navigate(`/search/${genre.query}`)
             }}
             key={genre.name}
             className={`p-6 rounded-lg shadow-lg bg-gradient-to-br ${genre.gradient} transition-transform duration-300 ease-in-out transform hover:scale-105`}
