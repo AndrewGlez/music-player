@@ -23,7 +23,10 @@ const commonjsPackages = [
   'node:fs',
   'stompjs',
   'node:events',
-  'mousetrap'
+  'mousetrap',
+  'mqtt',
+  'diagnostics_channel',
+  '@stomp/stompjs'
 ] as const
 export default defineConfig({
   main: {

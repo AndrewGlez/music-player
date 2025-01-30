@@ -12,7 +12,19 @@ import FindUsersOnline from './pages/OnlinePage'
 import audioPlayer from './stream'
 import { useEffect, useState } from 'react'
 import Mousetrap from 'mousetrap'
-import wsclient from './wsclient'
+import { config } from './config'
+const BROKER_URL = `ws://${config.BACKEND_URL}:8083/mqtt`
+import mqtt from 'mqtt'
+
+
+export const client = mqtt.connect(BROKER_URL)
+
+client.on('connect', function () {
+  console.log('Connected to MQTT broker')
+  client.subscribe('/topic/online')
+})
+
+
 function App(): JSX.Element {
   Mousetrap.bind(['command+r', 'ctrl+r', 'f5'], function () {
     return false
@@ -27,7 +39,6 @@ function App(): JSX.Element {
 }
 
 function AppContent(): JSX.Element {
-  const user_id = localStorage.getItem('user_id')
   const [connected, setConnected] = useState(false)
 
   useEffect(() => {
@@ -36,14 +47,10 @@ function AppContent(): JSX.Element {
     if (!connected) {
       setConnected(true)
       audioPlayer.connectWithIpc()
-      wsclient.connect(user_id)
-      wsclient.suscribeTo("/topic/online")
     }
     window.onload = () => {
       setConnected(true)
       audioPlayer.connectWithIpc()
-      wsclient.connect(user_id)
-      wsclient.suscribeTo("/topic/online")
     }
   }, [])
   return (

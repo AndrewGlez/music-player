@@ -154,7 +154,7 @@ export default function RegisterPage() {
         </div>
         <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{' '}
-          <a onClick={() => navigate('/register')} className="text-indigo-600 hover:underline">
+          <a onClick={() => navigate('/login')} className="text-indigo-600 hover:underline">
             Log in
           </a>
         </p>
